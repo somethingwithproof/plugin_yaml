@@ -17,7 +17,7 @@
 [info]
 name = yaml
 version = 0.1.0
-longname = YAML Templates, Schema & CasC Fragments
+longname = "YAML Templates, Schema & CasC Fragments"
 author = "Thomas Vincent (somethingwithproof)"
 email = thomasvincent@gmail.com
 homepage = https://github.com/somethingwithproof/plugin_yaml

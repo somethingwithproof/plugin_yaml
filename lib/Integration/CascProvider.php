@@ -195,7 +195,7 @@ final class CascProvider {
 	 * Build plain-array template compiler descriptors for `casc_register_template_compilers`.
 	 *
 	 * @param mixed $compilers Existing hook payload.
-	 * @return list<array{id: string, extensions: list<string>, compile: callable(string): array{xml: string, sha256: string, hashes: list<string>}}>
+	 * @return list<array{id: string, extensions: list<string>, compile: callable(string, array<string, mixed>=): string}>
 	 */
 	public static function registerTemplateCompilers(mixed $compilers): array {
 		$existing = [];
@@ -203,7 +203,7 @@ final class CascProvider {
 		if (is_array($compilers)) {
 			foreach ($compilers as $item) {
 				if (is_array($item)) {
-					/** @var array{id: string, extensions: list<string>, compile: callable(string): array{xml: string, sha256: string, hashes: list<string>}} $item */
+					/** @var array{id: string, extensions: list<string>, compile: callable(string, array<string, mixed>=): string} $item */
 					$existing[] = $item;
 				}
 			}
@@ -212,8 +212,10 @@ final class CascProvider {
 		$existing[] = [
 			'id'         => 'plugin_yaml_template_compiler',
 			'extensions' => ['yaml', 'yml'],
-			'compile'    => static function (string $yaml): array {
-				return TemplateCompiler::compileYaml($yaml);
+			'compile'    => static function (string $yaml, array $context = []): string {
+				$result = TemplateCompiler::compileYaml($yaml);
+
+				return $result['xml'];
 			},
 		];
 

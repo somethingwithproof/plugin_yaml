@@ -314,18 +314,75 @@ YAML);
 			$compilers = CascProvider::registerTemplateCompilers([]);
 			$this->assertCount(1, $compilers);
 			$this->assertSame(['yaml', 'yml'], $compilers[0]['extensions']);
+			$compiledXml = ($compilers[0]['compile'])(<<<'YAML'
+apiVersion: cacti.yaml/v1
+kind: CactiTemplateBundle
+metadata:
+  name: hook_bundle
+spec:
+  objects:
+    - ref: gprint_preset/normal
+      type: gprint_preset
+      fields:
+        name: Normal
+        gprint_text: '%8.2lf %s'
+YAML);
+			$this->assertIsString($compiledXml);
+			$this->assertStringContainsString('<cacti>', $compiledXml);
 
 			$described = CascProvider::describeSchema([], $pluginDir);
 			$this->assertCount(1, $described);
 			$this->assertSame('yaml', $described[0]['plugin']);
 
-			// Verify Doctor checks.
-			$checks = DoctorChecks::build($factory, static fn (): Settings => $settings, $cactiRoot);
+			// Verify Doctor checks in mode=list (no factory calls) and mode=run.
+			$factoryCalls = 0;
+			$listChecks   = DoctorChecks::build(
+				static function () use ($service, &$factoryCalls): YamlService {
+					$factoryCalls++;
+
+					return $service;
+				},
+				static function () use ($settings, &$factoryCalls): Settings {
+					$factoryCalls++;
+
+					return $settings;
+				},
+				$cactiRoot,
+				['mode' => 'list', 'plugin' => 'yaml']
+			);
+			$this->assertSame(0, $factoryCalls);
+			$this->assertCount(3, $listChecks);
+
+			foreach ($listChecks as $check) {
+				$this->assertStringStartsWith('yaml.', $check['id']);
+				$this->assertSame('yaml', $check['plugin']);
+				$this->assertSame('info', $check['status']);
+			}
+
+			$checks = DoctorChecks::build($factory, static fn (): Settings => $settings, $cactiRoot, ['mode' => 'run', 'plugin' => 'yaml']);
 			$this->assertCount(3, $checks);
 
 			foreach ($checks as $check) {
-				$res = ($check['run'])();
-				$this->assertSame('ok', $res['status'], $check['id'] . ': ' . $res['message']);
+				$this->assertStringStartsWith('yaml.', $check['id']);
+				$this->assertSame('yaml', $check['plugin']);
+				$this->assertSame('YAML', $check['category']);
+				$this->assertNotSame('', $check['title']);
+				$this->assertSame('ok', $check['status'], $check['id'] . ': ' . $check['message']);
+				$this->assertNotSame('', $check['message']);
+				$this->assertIsArray($check['details']);
+				$this->assertIsString($check['remediation']);
+			}
+
+			// Verify Doctor debug info canonical section shape.
+			$debugSections = DoctorChecks::debugInfo($factory, static fn (): Settings => $settings, '0.1.0');
+			$this->assertCount(1, $debugSections);
+			$this->assertSame('yaml.overview', $debugSections[0]['id']);
+			$this->assertSame('yaml', $debugSections[0]['plugin']);
+			$this->assertSame('strict', $debugSections[0]['fields']['merge_policy']['value']);
+
+			foreach ($debugSections[0]['fields'] as $fieldKey => $field) {
+				$this->assertIsString($field['label'], 'Field label must be string: ' . $fieldKey);
+				$this->assertTrue(is_scalar($field['value']), 'Field value must be scalar: ' . $fieldKey);
 			}
 
 			// Verify MCP abilities registration & execution.
@@ -363,20 +420,38 @@ YAML);
 			$valAbilityRes = ($registeredAbilities['yaml-validate-source']['execute'])(1, new \stdClass());
 			$this->assertTrue($valAbilityRes['valid']);
 
-			// Verify plugin_api resource descriptors.
+			// Verify canonical plugin_api resource descriptors.
 			$apiResources = ApiResources::register([], $factory);
 			$this->assertCount(2, $apiResources);
-			$this->assertSame('yamlPacks', $apiResources[0]['resource']);
-			$this->assertSame('yamlSchema', $apiResources[1]['resource']);
-			$this->assertSame(['yamlPacks' => []], ($apiResources[0]['list'])());
-			$this->assertNull(($apiResources[0]['get'])('missing'));
-			$this->assertArrayHasKey('$schema', ($apiResources[1]['get'])());
+			$this->assertSame('yaml', $apiResources[0]['plugin']);
+			$this->assertSame('yamlPacks', $apiResources[0]['collection']);
+			$this->assertSame('yaml_view.php', $apiResources[0]['realm_read']);
+			$this->assertSame([], ($apiResources[0]['handlers']['list'])(['user_id' => 1]));
+			$this->assertNull(($apiResources[0]['handlers']['get'])('missing', ['user_id' => 1]));
 
-			// Verify setup.php metadata & standalone hook wrappers.
+			$this->assertSame('yaml', $apiResources[1]['plugin']);
+			$this->assertSame('yamlSchema', $apiResources[1]['collection']);
+			$this->assertSame('yaml_view.php', $apiResources[1]['realm_read']);
+			$this->assertCount(1, ($apiResources[1]['handlers']['list'])(['user_id' => 1]));
+			$this->assertArrayHasKey('$schema', ($apiResources[1]['handlers']['get'])('current', ['user_id' => 1]));
+			$this->assertNull(($apiResources[1]['handlers']['get'])('unknown', ['user_id' => 1]));
+
+			// Verify setup.php metadata (including quoted INFO longname) & standalone hook wrappers.
 			$versionInfo = plugin_yaml_version();
 			$this->assertSame('yaml', $versionInfo['name']);
+			$this->assertSame('YAML Templates, Schema & CasC Fragments', $versionInfo['longname']);
+			$this->assertArrayHasKey('doctor_register_debug_info', \Somethingwithproof\Yaml\Schema::HOOKS);
 			$this->assertTrue(yaml_php_supported());
 			$this->assertTrue(yaml_verify_csrf());
+
+			$hookChecks = yaml_doctor_register_checks(['mode' => 'list', 'plugin' => 'yaml']);
+			$this->assertCount(3, $hookChecks);
+			$this->assertArrayNotHasKey('mode', $hookChecks);
+
+			$hookDebug = yaml_doctor_register_debug_info(['plugin' => 'yaml']);
+			$this->assertCount(1, $hookDebug);
+			$this->assertArrayNotHasKey('plugin', $hookDebug);
+			$this->assertSame('yaml.overview', $hookDebug[0]['id']);
 		} finally {
 			$this->removeTree($root);
 		}

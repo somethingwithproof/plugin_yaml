@@ -42,6 +42,7 @@ final class Schema {
 		'casc_register_template_compilers' => 'yaml_casc_register_template_compilers',
 		'casc_describe_schema'             => 'yaml_casc_describe_schema',
 		'doctor_register_checks'           => 'yaml_doctor_register_checks',
+		'doctor_register_debug_info'       => 'yaml_doctor_register_debug_info',
 		'abilities_register'               => 'yaml_abilities_register',
 		'api_register_resources'           => 'yaml_api_register_resources',
 	];

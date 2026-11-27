@@ -67,7 +67,7 @@ final class EdgeAndCoverageTest extends TestCase {
 			public bool $failTableCreate = false;
 			public string $pluginVersion = '0.1.0';
 			public int $pluginStatus = 1;
-			public int $hookCount = 10;
+			public int $hookCount = 11;
 			public int $realmCount = 3;
 			/** @var list<string> */
 			public array $executed = [];
@@ -308,18 +308,21 @@ final class EdgeAndCoverageTest extends TestCase {
 			$service  = new YamlService($settings, $repo, $cactiRoot, dirname(__DIR__, 2));
 
 			$checks = DoctorChecks::build(static fn (): YamlService => $service, static fn (): Settings => $settings, $cactiRoot);
-			$this->assertSame('warning', ($checks[0]['run'])()['status']);
-			$this->assertSame('critical', ($checks[1]['run'])()['status']);
-			$this->assertSame('warning', ($checks[2]['run'])()['status']);
+			$this->assertSame('warn', $checks[0]['status']);
+			$this->assertSame('fail', $checks[1]['status']);
+			$this->assertSame('warn', $checks[2]['status']);
 
 			// Verify populated UI tables render packs and audits.
 			$html = PagesRenderer::renderViewPage($service->exportRedactedState(), $service->discoverSchemas(), $repo->listPacks(), $repo->getRecentAudits(10));
 			$this->assertStringContainsString('net-pack', $html);
 			$this->assertStringContainsString('reload', $html);
 
-			// Verify ApiResources populated pack get & codec closures.
+			// Verify ApiResources populated pack list, get, & codec closures.
 			$resources = ApiResources::register([], static fn (): YamlService => $service);
-			$packEntry = ($resources[0]['get'])('net-pack');
+			$packList  = ($resources[0]['handlers']['list'])(['user_id' => 1]);
+			$this->assertCount(1, $packList);
+			$this->assertSame('net-pack', $packList[0]['id']);
+			$packEntry = ($resources[0]['handlers']['get'])('net-pack', ['user_id' => 1]);
 			$this->assertIsArray($packEntry);
 			$this->assertSame('2.0.0', $packEntry['version']);
 			$this->assertSame(['a' => 1], ($resources[0]['codec']['decode'])("a: 1\n"));

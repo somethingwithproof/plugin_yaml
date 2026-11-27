@@ -113,14 +113,20 @@ YAML);
 			$this->assertSame('resource/snmp_queries/ci_int_if.xml', $queries[0]['output_file']);
 			$this->assertNotEmpty($audits);
 
-			// 4. Verify Doctor checks pass against live compiled query XML checksum.
-			$checks = yaml_doctor_register_checks([]);
-			$this->assertIsArray($checks);
+			// 4. Verify Doctor checks and debug info pass against live compiled query XML checksum.
+			$checks = yaml_doctor_register_checks(['mode' => 'run', 'plugin' => 'yaml']);
+			$this->assertCount(3, $checks);
 
 			foreach ($checks as $check) {
-				$result = ($check['run'])();
-				$this->assertSame('ok', $result['status'], $check['id'] . ': ' . $result['message']);
+				$this->assertStringStartsWith('yaml.', (string) ($check['id'] ?? ''));
+				$this->assertSame('yaml', $check['plugin'] ?? null);
+				$this->assertSame('ok', $check['status'] ?? null, ($check['id'] ?? '') . ': ' . ($check['message'] ?? ''));
 			}
+
+			$debugInfo = yaml_doctor_register_debug_info(['plugin' => 'yaml']);
+			$this->assertCount(1, $debugInfo);
+			$this->assertSame('yaml.overview', $debugInfo[0]['id'] ?? null);
+			$this->assertSame('yaml', $debugInfo[0]['plugin'] ?? null);
 
 			// 5. Verify decoupled CasC and API hooks operate cleanly without plugin_casc/plugin_api installed.
 			$providers = yaml_casc_register_providers([]);
@@ -130,8 +136,9 @@ YAML);
 			$this->assertCount(1, $exportedState['packs']);
 
 			$apiResources = yaml_api_register_resources([]);
-			$this->assertIsArray($apiResources);
 			$this->assertCount(2, $apiResources);
+			$this->assertSame('yaml_view.php', $apiResources[0]['realm_read'] ?? null);
+			$this->assertIsArray($apiResources[0]['handlers'] ?? null);
 		} finally {
 			@unlink($cactiRoot . '/resource/snmp_queries/ci_int_if.xml');
 			@unlink($packDir . '/queries/ci_if.yaml');

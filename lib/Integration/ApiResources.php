@@ -32,9 +32,14 @@ use Somethingwithproof\Yaml\Service\YamlService;
  */
 final class ApiResources {
 	/**
+	 * Relative path to plugin_yaml's static Config/State YAML schema file.
+	 */
+	private const SCHEMA_PATH = 'schema/yaml.schema.yaml';
+
+	/**
 	 * Build plain-array Google AIP-compatible resource descriptors for `plugin_api`.
 	 *
-	 * @param mixed $resources Existing hook payload.
+	 * @param mixed                   $resources      Existing hook payload.
 	 * @param callable(): YamlService $serviceFactory Lazy service factory.
 	 * @return list<array<string, mixed>>
 	 */
@@ -43,7 +48,7 @@ final class ApiResources {
 
 		if (is_array($resources)) {
 			foreach ($resources as $item) {
-				if (is_array($item)) {
+				if (is_array($item) && is_string($item['collection'] ?? null) && $item['collection'] !== '') {
 					$normalized = [];
 
 					foreach ($item as $k => $v) {
@@ -56,46 +61,53 @@ final class ApiResources {
 		}
 
 		$list[] = [
-			'resource'    => 'yamlPacks',
-			'singular'    => 'yamlPack',
-			'collection'  => 'yamlPacks',
-			'plugin'      => 'yaml',
-			'realm'       => Pages::VIEW,
-			'mediaTypes'  => ['application/json', 'application/yaml'],
-			'methods'     => ['list', 'get'],
-			'list'        => static function () use ($serviceFactory): array {
-				$packs = $serviceFactory()->repository()->listPacks();
+			'plugin'        => 'yaml',
+			'collection'    => 'yamlPacks',
+			'singleton'     => 'yamlPack',
+			'description'   => 'Installed YAML Monitoring Packs and SHA-256 lock digests.',
+			'realm_read'    => Pages::VIEW,
+			'schema'        => self::SCHEMA_PATH,
+			'filter_fields' => ['id', 'name', 'version', 'status'],
+			'order_fields'  => ['id', 'name', 'version'],
+			'handlers'      => [
+				'list' => static function (array $context = []) use ($serviceFactory): array {
+					$packs = $serviceFactory()->repository()->listPacks();
 
-				return [
-					'yamlPacks' => array_map(
-						static fn (array $row): array => [
-							'name'           => 'yamlPacks/' . (is_scalar($row['name'] ?? null) ? (string) $row['name'] : ''),
-							'packId'         => is_scalar($row['name'] ?? null) ? (string) $row['name'] : '',
-							'version'        => is_scalar($row['version'] ?? null) ? (string) $row['version'] : '',
-							'status'         => is_scalar($row['status'] ?? null) ? (string) $row['status'] : '',
-							'manifestSha256' => is_scalar($row['manifest_sha256'] ?? null) ? (string) $row['manifest_sha256'] : '',
-							'lockSha256'     => is_scalar($row['lock_sha256'] ?? null) ? (string) $row['lock_sha256'] : '',
-						],
+					return array_map(
+						static function (array $row): array {
+							$packName = is_scalar($row['name'] ?? null) ? (string) $row['name'] : '';
+
+							return [
+								'id'             => $packName,
+								'name'           => 'yamlPacks/' . $packName,
+								'packId'         => $packName,
+								'version'        => is_scalar($row['version'] ?? null) ? (string) $row['version'] : '',
+								'status'         => is_scalar($row['status'] ?? null) ? (string) $row['status'] : '',
+								'manifestSha256' => is_scalar($row['manifest_sha256'] ?? null) ? (string) $row['manifest_sha256'] : '',
+								'lockSha256'     => is_scalar($row['lock_sha256'] ?? null) ? (string) $row['lock_sha256'] : '',
+							];
+						},
 						$packs
-					),
-				];
-			},
-			'get' => static function (string $packId) use ($serviceFactory): ?array {
-				$row = $serviceFactory()->repository()->getPackByName($packId);
+					);
+				},
+				'get' => static function (string $packId, array $context = []) use ($serviceFactory): ?array {
+					$row = $serviceFactory()->repository()->getPackByName($packId);
 
-				if ($row === null) {
-					return null;
-				}
+					if ($row === null) {
+						return null;
+					}
 
-				return [
-					'name'           => 'yamlPacks/' . $packId,
-					'packId'         => $packId,
-					'version'        => is_scalar($row['version'] ?? null) ? (string) $row['version'] : '',
-					'status'         => is_scalar($row['status'] ?? null) ? (string) $row['status'] : '',
-					'manifestSha256' => is_scalar($row['manifest_sha256'] ?? null) ? (string) $row['manifest_sha256'] : '',
-					'lockSha256'     => is_scalar($row['lock_sha256'] ?? null) ? (string) $row['lock_sha256'] : '',
-				];
-			},
+					return [
+						'id'             => $packId,
+						'name'           => 'yamlPacks/' . $packId,
+						'packId'         => $packId,
+						'version'        => is_scalar($row['version'] ?? null) ? (string) $row['version'] : '',
+						'status'         => is_scalar($row['status'] ?? null) ? (string) $row['status'] : '',
+						'manifestSha256' => is_scalar($row['manifest_sha256'] ?? null) ? (string) $row['manifest_sha256'] : '',
+						'lockSha256'     => is_scalar($row['lock_sha256'] ?? null) ? (string) $row['lock_sha256'] : '',
+					];
+				},
+			],
 			'codec' => [
 				'decode' => static fn (string $yaml): mixed => YamlParser::parse($yaml),
 				'encode' => static fn (mixed $data): string => YamlEmitter::emit($data),
@@ -103,16 +115,36 @@ final class ApiResources {
 		];
 
 		$list[] = [
-			'resource'    => 'yamlSchema',
-			'singular'    => 'yamlSchema',
-			'collection'  => 'yamlSchema',
-			'plugin'      => 'yaml',
-			'realm'       => Pages::VIEW,
-			'mediaTypes'  => ['application/schema+json', 'application/json'],
-			'methods'     => ['get'],
-			'get'         => static function () use ($serviceFactory): array {
-				return $serviceFactory()->generateSchema()['schema'];
-			},
+			'plugin'        => 'yaml',
+			'collection'    => 'yamlSchema',
+			'singleton'     => 'yamlSchema',
+			'description'   => 'Aggregated Draft 2020-12 JSON Schema for Cacti YAML manifests.',
+			'realm_read'    => Pages::VIEW,
+			'schema'        => self::SCHEMA_PATH,
+			'filter_fields' => ['id', 'name'],
+			'order_fields'  => ['id', 'name'],
+			'handlers'      => [
+				'list' => static function (array $context = []) use ($serviceFactory): array {
+					$generated = $serviceFactory()->generateSchema();
+
+					return [
+						[
+							'id'       => 'current',
+							'name'     => 'yamlSchema/current',
+							'schemaId' => is_string($generated['schema']['$id'] ?? null) ? $generated['schema']['$id'] : '',
+							'plugins'  => $generated['plugins'],
+							'schema'   => $generated['schema'],
+						],
+					];
+				},
+				'get' => static function (string $id = 'current', array $context = []) use ($serviceFactory): ?array {
+					if ($id !== '' && $id !== 'current' && $id !== 'latest') {
+						return null;
+					}
+
+					return $serviceFactory()->generateSchema()['schema'];
+				},
+			],
 		];
 
 		return $list;

@@ -477,32 +477,60 @@ function yaml_casc_describe_schema($schemas) {
 /**
  * Hook `doctor_register_checks`: contribute YAML diagnostic checks to plugin_doctor.
  *
- * @param mixed $checks Existing check descriptors.
- * @return mixed
+ * @param mixed $context Hook context array containing mode ('run'|'list') and plugin slug.
+ * @return list<array<string, mixed>>
  */
-function yaml_doctor_register_checks($checks) {
+function yaml_doctor_register_checks($context = array()): array {
 	global $config;
 
 	if (!yaml_boot()) {
-		return $checks;
+		return array();
+	}
+
+	$normalized = array();
+
+	if (is_array($context)) {
+		foreach ($context as $key => $value) {
+			$normalized[(string) $key] = $value;
+		}
 	}
 
 	$basePath = is_string($config['base_path'] ?? null) ? $config['base_path'] : '';
-	$built    = \Somethingwithproof\Yaml\Integration\DoctorChecks::build(
+
+	return \Somethingwithproof\Yaml\Integration\DoctorChecks::build(
 		static function (): \Somethingwithproof\Yaml\Service\YamlService {
 			return yaml_service();
 		},
 		static function (): \Somethingwithproof\Yaml\Settings {
 			return yaml_settings();
 		},
-		$basePath
+		$basePath,
+		$normalized
 	);
+}
 
-	if (is_array($checks)) {
-		return array_merge($checks, $built);
+/**
+ * Hook `doctor_register_debug_info`: contribute redacted YAML runtime metadata to plugin_doctor.
+ *
+ * @param mixed $context Optional hook context passed by plugin_doctor.
+ * @return list<array<string, mixed>>
+ */
+function yaml_doctor_register_debug_info($context = array()): array {
+	if (!yaml_boot()) {
+		return array();
 	}
 
-	return $built;
+	$info = plugin_yaml_version();
+
+	return \Somethingwithproof\Yaml\Integration\DoctorChecks::debugInfo(
+		static function (): \Somethingwithproof\Yaml\Service\YamlService {
+			return yaml_service();
+		},
+		static function (): \Somethingwithproof\Yaml\Settings {
+			return yaml_settings();
+		},
+		$info['version'] ?? '0.1.0'
+	);
 }
 
 /**
@@ -532,11 +560,11 @@ function yaml_abilities_register($registrar): void {
  * descriptors for plugin_api.
  *
  * @param mixed $resources Existing resource descriptors.
- * @return mixed
+ * @return list<array<string, mixed>>
  */
-function yaml_api_register_resources($resources) {
+function yaml_api_register_resources($resources = array()): array {
 	if (!yaml_boot()) {
-		return $resources;
+		return array();
 	}
 
 	return \Somethingwithproof\Yaml\Integration\ApiResources::register(
