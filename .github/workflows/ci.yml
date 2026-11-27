@@ -1,0 +1,214 @@
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# This file is part of plugin_yaml, a plugin for Cacti.
+# https://github.com/somethingwithproof/plugin_yaml
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  entry-point-lint:
+    name: PHP 8.0 entry point lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP 8.0
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.0'
+          coverage: none
+
+      - name: Lint PHP 8.0 entry points
+        run: |
+          set -euo pipefail
+          php -v
+          for f in *.php include/*.php cli/*.php; do
+            php -l "$f"
+          done
+
+  unit-static-coverage:
+    name: PHP ${{ matrix.php }} unit, PHPDoc, PHPStan L9, and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Checkout Cacti 1.2.31 for symbol scanning
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: Cacti/cacti
+          ref: release/1.2.31
+          path: cacti
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, json, libxml, mbstring, pdo, pdo_mysql
+          coverage: pcov
+
+      - name: Lint all PHP files
+        run: |
+          set -euo pipefail
+          find lib tests cli include -name '*.php' -print0 | xargs -0 -n1 php -l
+          for f in *.php; do php -l "$f"; done
+
+      - name: Install dev tools (zero runtime dependencies)
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run unit, security, and PHPDoc gate tests with pcov Clover coverage
+        run: |
+          set -euo pipefail
+          php -d pcov.enabled=1 -d pcov.directory=lib vendor/bin/phpunit -c phpunit.xml --coverage-clover clover.xml --coverage-text
+
+      - name: Enforce minimum 85% line coverage
+        run: |
+          php -r '
+          $xml = simplexml_load_file("clover.xml");
+          if ($xml === false) { fwrite(STDERR, "Missing clover.xml\n"); exit(1); }
+          $metrics = $xml->project->metrics;
+          $statements = (int) $metrics["statements"];
+          $covered = (int) $metrics["coveredstatements"];
+          $pct = $statements > 0 ? round(($covered / $statements) * 100, 2) : 0.0;
+          echo "Measured line coverage: {$covered}/{$statements} ({$pct}%)\n";
+          if ($pct < 85.0) {
+              fwrite(STDERR, "Coverage {$pct}% is below required 85.0% threshold.\n");
+              exit(1);
+          }
+          '
+
+      - name: Run PHPStan Level 9
+        env:
+          CACTI_PATH: ${{ github.workspace }}/cacti
+        run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
+
+  cacti-integration:
+    name: Integration PHP ${{ matrix.php }} on Cacti ${{ matrix.cacti }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+        cacti: ['release/1.2.31', '1.2.x']
+
+    services:
+      mariadb:
+        image: mariadb:11.8@sha256:6422478cb8e159f080fb1d8ccf65101e26fe51385787fde7d16c3b165a331f15
+        env:
+          MYSQL_ROOT_PASSWORD: cactiroot
+          MYSQL_DATABASE: cacti
+          MYSQL_USER: cactiuser
+          MYSQL_PASSWORD: cactiuser
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout Cacti
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: Cacti/cacti
+          ref: ${{ matrix.cacti }}
+          path: cacti
+
+      - name: Checkout plugin_yaml
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: cacti/plugins/yaml
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, mysql, gd, ldap, gmp, xml, curl, json, mbstring, snmp
+          ini-values: "post_max_size=256M, max_execution_time=60, date.timezone=UTC"
+          coverage: none
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rrdtool gettext mariadb-client
+
+      - name: Initialize Cacti MariaDB schema
+        run: |
+          printf "[client]\nuser = root\npassword = cactiroot\nhost = 127.0.0.1\n" > ~/.my.cnf
+          chmod 600 ~/.my.cnf
+          mariadb -e "CREATE USER IF NOT EXISTS 'cactiuser'@'127.0.0.1' IDENTIFIED BY 'cactiuser';"
+          mariadb -e "GRANT ALL PRIVILEGES ON cacti.* TO 'cactiuser'@'127.0.0.1';"
+          mariadb -e "GRANT SELECT ON mysql.time_zone_name TO 'cactiuser'@'127.0.0.1';"
+          mariadb -e "FLUSH PRIVILEGES;"
+          mariadb cacti < cacti/cacti.sql
+          mariadb -e "INSERT INTO settings (name, value) VALUES ('path_php_binary', '$(command -v php)')" cacti
+
+      - name: Configure and install Cacti
+        run: |
+          sed -r "s/localhost/127.0.0.1/g" cacti/include/config.php.dist > cacti/include/config.php
+          cd cacti
+          php cli/install_cacti.php --accept-eula --install --force
+          php cli/plugin_manage.php --plugin=yaml --install --enable
+
+      - name: Install dev tools for integration test runner
+        working-directory: cacti/plugins/yaml
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run MariaDB integration tests
+        working-directory: cacti/plugins/yaml
+        env:
+          CACTI_PATH: ${{ github.workspace }}/cacti
+        run: vendor/bin/phpunit -c phpunit-integration.xml
+
+      - name: Smoke-test CLI commands against live Cacti
+        working-directory: cacti
+        run: |
+          set -euo pipefail
+          php plugins/yaml/cli/yaml.php help
+          php plugins/yaml/cli/yaml.php schema --out=/tmp/cacti-casc.schema.json
+          php plugins/yaml/cli/yaml.php schema --reference=markdown --out=/tmp/cacti-reference.md
+          php plugins/yaml/cli/yaml.php decompile --in=resource/snmp_queries/interface.xml --out=/tmp/interface.yaml --name=resource/snmp_queries/interface.xml
+          php plugins/yaml/cli/yaml.php compile --in=/tmp/interface.yaml --out=/tmp/interface-compiled.xml
+          php plugins/yaml/cli/yaml.php validate --source=/tmp/interface.yaml
