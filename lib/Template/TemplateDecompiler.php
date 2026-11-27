@@ -165,7 +165,11 @@ final class TemplateDecompiler {
 	 * @return void
 	 */
 	private static function registerNestedHashes(\DOMElement $element, HashRegistry $registry): void {
-		foreach (self::elementChildren($element) as $child) {
+		foreach ($element->childNodes as $child) {
+			if (!$child instanceof \DOMElement) {
+				continue;
+			}
+
 			$parsed = HashRegistry::parseTag($child->nodeName);
 
 			if ($parsed !== null) {
@@ -173,7 +177,9 @@ final class TemplateDecompiler {
 				$registry->registerDecompiled($parsed['type'], $parsed['versionCode'], $parsed['hash'], $hint);
 			}
 
-			self::registerNestedHashes($child, $registry);
+			if ($child->hasChildNodes()) {
+				self::registerNestedHashes($child, $registry);
+			}
 		}
 	}
 
@@ -189,9 +195,12 @@ final class TemplateDecompiler {
 	private static function convertChildren(\DOMElement $element, HashRegistry $registry): array {
 		$result = [];
 
-		foreach (self::elementChildren($element) as $child) {
-			$children = self::elementChildren($child);
-			$parsed   = HashRegistry::parseTag($child->nodeName);
+		foreach ($element->childNodes as $child) {
+			if (!$child instanceof \DOMElement) {
+				continue;
+			}
+
+			$parsed = HashRegistry::parseTag($child->nodeName);
 
 			if ($parsed !== null) {
 				$ref      = $registry->refForHash($parsed['hash']) ?? ($parsed['type'] . '/' . substr($parsed['hash'], 0, 8));
@@ -214,7 +223,7 @@ final class TemplateDecompiler {
 
 			$key = $child->nodeName;
 
-			if ($children !== []) {
+			if (self::hasElementChild($child)) {
 				$converted = self::convertChildren($child, $registry);
 
 				if (count($converted) === 1 && isset($converted['__hashItems']) && is_array($converted['__hashItems'])) {
@@ -239,6 +248,10 @@ final class TemplateDecompiler {
 	 * @return string Symbolic reference string or original literal text.
 	 */
 	private static function rewriteHashText(string $rawText, HashRegistry $registry): string {
+		if (strlen($rawText) < 43 || stripos($rawText, 'hash_') === false) {
+			return $rawText;
+		}
+
 		$trimmed = trim($rawText);
 
 		if ($trimmed === '') {
@@ -283,25 +296,62 @@ final class TemplateDecompiler {
 	}
 
 	/**
-	 * Extract a human-readable hint name from a template XML element for slugging.
+	 * Extract a human-readable hint name from a template XML element in a single child pass.
 	 *
 	 * @param \DOMElement $element Template DOM element.
 	 * @return string Hint name or empty string.
 	 */
 	private static function extractDisplayName(\DOMElement $element): string {
-		foreach (['name', 'data_source_name', 'text_format', 'field_name', 'sequence'] as $candidate) {
-			foreach (self::elementChildren($element) as $child) {
-				if ($child->nodeName === $candidate) {
-					$val = trim($child->textContent);
+		$priorities = [
+			'name'             => 0,
+			'data_source_name' => 1,
+			'text_format'      => 2,
+			'field_name'       => 3,
+			'sequence'         => 4,
+		];
+		$bestRank = 99;
+		$bestVal  = '';
 
-					if ($val !== '') {
-						return $val;
-					}
+		foreach ($element->childNodes as $child) {
+			if (!$child instanceof \DOMElement) {
+				continue;
+			}
+
+			$rank = $priorities[$child->nodeName] ?? 99;
+
+			if ($rank >= $bestRank) {
+				continue;
+			}
+
+			$val = trim($child->textContent);
+
+			if ($val !== '') {
+				$bestRank = $rank;
+				$bestVal  = $val;
+
+				if ($bestRank === 0) {
+					return $bestVal;
 				}
 			}
 		}
 
-		return '';
+		return $bestVal;
+	}
+
+	/**
+	 * Return true when a DOMElement contains at least one direct DOMElement child.
+	 *
+	 * @param \DOMElement $element Parent element.
+	 * @return bool
+	 */
+	private static function hasElementChild(\DOMElement $element): bool {
+		foreach ($element->childNodes as $child) {
+			if ($child instanceof \DOMElement) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

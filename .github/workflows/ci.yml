@@ -51,7 +51,7 @@ jobs:
         run: |
           set -euo pipefail
           php -v
-          for f in *.php include/*.php cli/*.php; do
+          for f in *.php include/*.php cli/*.php scripts/*.php; do
             php -l "$f"
           done
 
@@ -88,7 +88,7 @@ jobs:
       - name: Lint all PHP files
         run: |
           set -euo pipefail
-          find lib tests cli include -name '*.php' -print0 | xargs -0 -n1 php -l
+          find lib tests cli include scripts -name '*.php' -print0 | xargs -0 -n1 php -l
           for f in *.php; do php -l "$f"; done
 
       - name: Install dev tools (zero runtime dependencies)
@@ -212,3 +212,4 @@ jobs:
           php plugins/yaml/cli/yaml.php decompile --in=resource/snmp_queries/interface.xml --out=/tmp/interface.yaml --name=resource/snmp_queries/interface.xml
           php plugins/yaml/cli/yaml.php compile --in=/tmp/interface.yaml --out=/tmp/interface-compiled.xml
           php plugins/yaml/cli/yaml.php validate --source=/tmp/interface.yaml
+          php plugins/yaml/scripts/ss_yaml_stats.php

@@ -77,11 +77,18 @@ final class YamlParser {
 	];
 
 	/**
-	 * Preprocessed source lines with line numbers and indentation.
+	 * Preprocessed source lines stored as packed tuples: [lineNo, indent, text, raw].
 	 *
-	 * @var list<array{line: int, indent: int, text: string, raw: string}>
+	 * Packed 4-element lists avoid per-line string-keyed Zend HashTable allocations.
+	 *
+	 * @var list<array{0: int, 1: int, 2: string, 3: string}>
 	 */
 	private array $lines = [];
+
+	/**
+	 * Cached line count matching count($this->lines).
+	 */
+	private int $lineCount = 0;
 
 	/**
 	 * Current cursor position in $this->lines.
@@ -109,6 +116,13 @@ final class YamlParser {
 	 * @var array<string, mixed>
 	 */
 	private array $anchors = [];
+
+	/**
+	 * Cached node counts per anchor name to keep repeated alias dereferences O(1).
+	 *
+	 * @var array<string, int>
+	 */
+	private array $anchorNodeCounts = [];
 
 	/**
 	 * Maximum document bytes configured for this parser instance.
@@ -205,104 +219,102 @@ final class YamlParser {
 			$input = substr($input, 3);
 		}
 
-		$this->lines         = [];
-		$this->pos           = 0;
-		$this->keyCount      = 0;
-		$this->literalNodes  = 0;
-		$this->expandedNodes = 0;
-		$this->anchors       = [];
+		$this->lines            = [];
+		$this->lineCount        = 0;
+		$this->pos              = 0;
+		$this->keyCount         = 0;
+		$this->literalNodes     = 0;
+		$this->expandedNodes    = 0;
+		$this->anchors          = [];
+		$this->anchorNodeCounts = [];
 
-		$normalized = str_replace(["\r\n", "\r"], "\n", $input);
+		$normalized = str_contains($input, "\r") ? str_replace(["\r\n", "\r"], "\n", $input) : $input;
 		$rawLines   = explode("\n", $normalized);
 		$inDoc      = false;
+		$hasContent = false;
+		$lines      = [];
 
 		foreach ($rawLines as $idx => $rawLine) {
-			$lineNo = $idx + 1;
-			$trimmed = trim($rawLine);
+			$lineNo  = $idx + 1;
+			$len     = strlen($rawLine);
+			$indent  = strspn($rawLine, ' ');
 
-			if ($trimmed === '' || str_starts_with($trimmed, '#')) {
-				$this->lines[] = ['line' => $lineNo, 'indent' => -1, 'text' => '', 'raw' => $rawLine];
+			if ($indent === $len) {
+				$lines[] = [$lineNo, -1, '', $rawLine];
 
 				continue;
 			}
 
-			if ($trimmed === '---' || str_starts_with($trimmed, '--- ')) {
-				if ($inDoc && $this->hasContentLines()) {
-					throw new YamlException(sprintf('Line %d: multi-document YAML streams are not permitted here.', $lineNo));
+			$firstChar = $rawLine[$indent];
+
+			if ($firstChar === '#') {
+				$lines[] = [$lineNo, -1, '', $rawLine];
+
+				continue;
+			}
+
+			if ($firstChar === "\t") {
+				if (trim($rawLine) === '') {
+					$lines[] = [$lineNo, -1, '', $rawLine];
+
+					continue;
 				}
 
-				$inDoc         = true;
-				$this->lines[] = ['line' => $lineNo, 'indent' => -1, 'text' => '', 'raw' => $rawLine];
-
-				continue;
-			}
-
-			if ($trimmed === '...') {
-				break;
-			}
-
-			if (str_starts_with($trimmed, '%YAML') || str_starts_with($trimmed, '%TAG')) {
-				if (str_starts_with($trimmed, '%TAG')) {
-					throw new YamlException(sprintf('Line %d: custom %%TAG directives are disallowed in safe YAML mode.', $lineNo));
-				}
-
-				$this->lines[] = ['line' => $lineNo, 'indent' => -1, 'text' => '', 'raw' => $rawLine];
-
-				continue;
-			}
-
-			$indent = 0;
-			$len    = strlen($rawLine);
-
-			while ($indent < $len && $rawLine[$indent] === ' ') {
-				$indent++;
-			}
-
-			if ($indent < $len && $rawLine[$indent] === "\t") {
 				throw new YamlException(sprintf('Line %d: tabs are not allowed for YAML indentation.', $lineNo));
 			}
 
-			$inDoc         = true;
-			$this->lines[] = [
-				'line'   => $lineNo,
-				'indent' => $indent,
-				'text'   => substr($rawLine, $indent),
-				'raw'    => $rawLine,
-			];
+			$text = $indent === 0 ? $rawLine : substr($rawLine, $indent);
+
+			if ($firstChar === '-' && ($text === '---' || str_starts_with($text, '--- ') || trim($text) === '---')) {
+				if ($inDoc && $hasContent) {
+					throw new YamlException(sprintf('Line %d: multi-document YAML streams are not permitted here.', $lineNo));
+				}
+
+				$inDoc   = true;
+				$lines[] = [$lineNo, -1, '', $rawLine];
+
+				continue;
+			}
+
+			if ($firstChar === '.' && ($text === '...' || trim($text) === '...')) {
+				break;
+			}
+
+			if ($firstChar === '%' && (str_starts_with($text, '%YAML') || str_starts_with($text, '%TAG'))) {
+				if (str_starts_with($text, '%TAG')) {
+					throw new YamlException(sprintf('Line %d: custom %%TAG directives are disallowed in safe YAML mode.', $lineNo));
+				}
+
+				$lines[] = [$lineNo, -1, '', $rawLine];
+
+				continue;
+			}
+
+			$inDoc      = true;
+			$hasContent = true;
+			$lines[]    = [$lineNo, $indent, $text, $rawLine];
 		}
+
+		$this->lines     = $lines;
+		$this->lineCount = count($lines);
 
 		$this->skipIgnorable();
 
-		if ($this->pos >= count($this->lines)) {
+		if ($this->pos >= $this->lineCount) {
 			return [];
 		}
 
 		$first = $this->lines[$this->pos];
-		$value = $this->parseNode($first['indent'], 0);
+		$value = $this->parseNode($first[1], 0);
 		$this->skipIgnorable();
 
-		if ($this->pos < count($this->lines)) {
+		if ($this->pos < $this->lineCount) {
 			$extra = $this->lines[$this->pos];
 
-			throw new YamlException(sprintf('Line %d: unexpected trailing content "%s".', $extra['line'], $extra['text']));
+			throw new YamlException(sprintf('Line %d: unexpected trailing content "%s".', $extra[0], $extra[2]));
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Determine whether any non-empty content lines have been buffered so far.
-	 *
-	 * @return bool
-	 */
-	private function hasContentLines(): bool {
-		foreach ($this->lines as $entry) {
-			if ($entry['indent'] >= 0) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -311,9 +323,9 @@ final class YamlParser {
 	 * @return void
 	 */
 	private function skipIgnorable(): void {
-		$count = count($this->lines);
+		$count = $this->lineCount;
 
-		while ($this->pos < $count && $this->lines[$this->pos]['indent'] < 0) {
+		while ($this->pos < $count && $this->lines[$this->pos][1] < 0) {
 			$this->pos++;
 		}
 	}
@@ -330,20 +342,20 @@ final class YamlParser {
 		$this->assertDepth($depth);
 		$this->skipIgnorable();
 
-		if ($this->pos >= count($this->lines)) {
+		if ($this->pos >= $this->lineCount) {
 			return null;
 		}
 
 		$current = $this->lines[$this->pos];
 
-		if ($current['indent'] < $expectedIndent) {
+		if ($current[1] < $expectedIndent) {
 			return null;
 		}
 
-		$text = $current['text'];
+		$text = $current[2];
 
 		if ($text === '-' || str_starts_with($text, '- ')) {
-			return $this->parseSequence($current['indent'], $depth);
+			return $this->parseSequence($current[1], $depth);
 		}
 
 		$cleanText = $this->stripInlineComment($text);
@@ -351,16 +363,16 @@ final class YamlParser {
 		if (str_starts_with($cleanText, '[') || str_starts_with($cleanText, '{')) {
 			$this->pos++;
 
-			return $this->parseInlineValue($cleanText, $current['line'], $depth);
+			return $this->parseInlineValue($cleanText, $current[0], $depth);
 		}
 
 		if ($this->findMappingColon($text) !== null) {
-			return $this->parseMapping($current['indent'], $depth);
+			return $this->parseMapping($current[1], $depth);
 		}
 
 		$this->pos++;
 
-		return $this->parseInlineValue($cleanText, $current['line'], $depth);
+		return $this->parseInlineValue($cleanText, $current[0], $depth);
 	}
 
 	/**
@@ -374,7 +386,7 @@ final class YamlParser {
 	private function parseSequence(int $indent, int $depth): array {
 		$this->assertDepth($depth);
 		$items = [];
-		$count = count($this->lines);
+		$count = $this->lineCount;
 
 		while (true) {
 			$this->skipIgnorable();
@@ -385,15 +397,15 @@ final class YamlParser {
 
 			$line = $this->lines[$this->pos];
 
-			if ($line['indent'] < $indent) {
+			if ($line[1] < $indent) {
 				break;
 			}
 
-			if ($line['indent'] > $indent) {
-				throw new YamlException(sprintf('Line %d: invalid indentation inside sequence.', $line['line']));
+			if ($line[1] > $indent) {
+				throw new YamlException(sprintf('Line %d: invalid indentation inside sequence.', $line[0]));
 			}
 
-			$text = $line['text'];
+			$text = $line[2];
 
 			if ($text !== '-' && !str_starts_with($text, '- ')) {
 				break;
@@ -403,39 +415,35 @@ final class YamlParser {
 			$rest   = $text === '-' ? '' : ltrim(substr($text, 2), ' ');
 			$anchor = null;
 			$tag    = null;
-			$rest   = $this->extractPrefixTokens($rest, $line['line'], $anchor, $tag);
+			$rest   = $this->extractPrefixTokens($rest, $line[0], $anchor, $tag);
 
-			if ($rest === '' || str_starts_with($rest, '#')) {
+			if ($rest === '' || $rest[0] === '#') {
 				$this->pos++;
 				$this->skipIgnorable();
 
-				if ($this->pos < $count && $this->lines[$this->pos]['indent'] > $indent) {
-					$item = $this->parseNode($this->lines[$this->pos]['indent'], $depth + 1);
+				if ($this->pos < $count && $this->lines[$this->pos][1] > $indent) {
+					$item = $this->parseNode($this->lines[$this->pos][1], $depth + 1);
 				} else {
 					$item = null;
 				}
 			} elseif ($this->isBlockScalarHeader($rest)) {
 				$this->pos++;
-				$item = $this->parseBlockScalar($rest, $indent, $line['line']);
-			} elseif ($this->findMappingColon($rest) !== null && !str_starts_with($rest, '{') && !str_starts_with($rest, '[')) {
+				$item = $this->parseBlockScalar($rest, $indent, $line[0]);
+			} elseif ($rest[0] !== '{' && $rest[0] !== '[' && $this->findMappingColon($rest) !== null) {
 				// Inline mapping item after "- ", e.g. "- name: foo".
-				$subIndent = $indent + 2;
-				$this->lines[$this->pos] = [
-					'line'   => $line['line'],
-					'indent' => $subIndent,
-					'text'   => $rest,
-					'raw'    => str_repeat(' ', $subIndent) . $rest,
-				];
-				$item = $this->parseMapping($subIndent, $depth + 1);
+				$subIndent               = $indent + 2;
+				$this->lines[$this->pos] = [$line[0], $subIndent, $rest, str_repeat(' ', $subIndent) . $rest];
+				$item                    = $this->parseMapping($subIndent, $depth + 1);
 			} else {
 				$this->pos++;
-				$item = $this->parseInlineValue($this->stripInlineComment($rest), $line['line'], $depth + 1);
+				$item = $this->parseInlineValue($this->stripInlineComment($rest), $line[0], $depth + 1);
 			}
 
-			$item = $this->applyTag($item, $tag, $line['line']);
+			$item = $this->applyTag($item, $tag, $line[0]);
 
 			if ($anchor !== null) {
 				$this->anchors[$anchor] = $item;
+				unset($this->anchorNodeCounts[$anchor]);
 			}
 
 			$items[] = $item;
@@ -455,7 +463,7 @@ final class YamlParser {
 	private function parseMapping(int $indent, int $depth): array {
 		$this->assertDepth($depth);
 		$map   = [];
-		$count = count($this->lines);
+		$count = $this->lineCount;
 
 		while (true) {
 			$this->skipIgnorable();
@@ -466,15 +474,15 @@ final class YamlParser {
 
 			$line = $this->lines[$this->pos];
 
-			if ($line['indent'] < $indent) {
+			if ($line[1] < $indent) {
 				break;
 			}
 
-			if ($line['indent'] > $indent) {
-				throw new YamlException(sprintf('Line %d: unexpected indentation inside mapping.', $line['line']));
+			if ($line[1] > $indent) {
+				throw new YamlException(sprintf('Line %d: unexpected indentation inside mapping.', $line[0]));
 			}
 
-			$text = $line['text'];
+			$text = $line[2];
 
 			if ($text === '-' || str_starts_with($text, '- ')) {
 				break;
@@ -483,12 +491,12 @@ final class YamlParser {
 			$colonPos = $this->findMappingColon($text);
 
 			if ($colonPos === null) {
-				throw new YamlException(sprintf('Line %d: expected "key: value" mapping entry.', $line['line']));
+				throw new YamlException(sprintf('Line %d: expected "key: value" mapping entry.', $line[0]));
 			}
 
 			$rawKey = trim(substr($text, 0, $colonPos));
 			$rest   = ltrim(substr($text, $colonPos + 1), ' ');
-			$key    = $this->parseMappingKey($rawKey, $line['line']);
+			$key    = $this->parseMappingKey($rawKey, $line[0]);
 
 			$this->keyCount++;
 
@@ -500,18 +508,18 @@ final class YamlParser {
 
 			$anchor = null;
 			$tag    = null;
-			$rest   = $this->extractPrefixTokens($rest, $line['line'], $anchor, $tag);
+			$rest   = $this->extractPrefixTokens($rest, $line[0], $anchor, $tag);
 
-			if ($rest === '' || str_starts_with($rest, '#')) {
+			if ($rest === '' || $rest[0] === '#') {
 				$this->pos++;
 				$this->skipIgnorable();
 
 				if ($this->pos < $count) {
 					$next = $this->lines[$this->pos];
 
-					if ($next['indent'] > $indent) {
-						$val = $this->parseNode($next['indent'], $depth + 1);
-					} elseif ($next['indent'] === $indent && ($next['text'] === '-' || str_starts_with($next['text'], '- '))) {
+					if ($next[1] > $indent) {
+						$val = $this->parseNode($next[1], $depth + 1);
+					} elseif ($next[1] === $indent && ($next[2] === '-' || str_starts_with($next[2], '- '))) {
 						// YAML allows block sequence items at the same indent as the parent mapping key.
 						$val = $this->parseSequence($indent, $depth + 1);
 					} else {
@@ -522,20 +530,21 @@ final class YamlParser {
 				}
 			} elseif ($this->isBlockScalarHeader($rest)) {
 				$this->pos++;
-				$val = $this->parseBlockScalar($rest, $indent, $line['line']);
+				$val = $this->parseBlockScalar($rest, $indent, $line[0]);
 			} else {
 				$this->pos++;
-				$val = $this->parseInlineValue($this->stripInlineComment($rest), $line['line'], $depth + 1);
+				$val = $this->parseInlineValue($this->stripInlineComment($rest), $line[0], $depth + 1);
 			}
 
-			$val = $this->applyTag($val, $tag, $line['line']);
+			$val = $this->applyTag($val, $tag, $line[0]);
 
 			if ($anchor !== null) {
 				$this->anchors[$anchor] = $val;
+				unset($this->anchorNodeCounts[$anchor]);
 			}
 
 			if ($key === '<<') {
-				$map = $this->applyMergeKey($map, $val, $line['line']);
+				$map = $this->applyMergeKey($map, $val, $line[0]);
 			} else {
 				$map[$key] = $val;
 			}
@@ -605,11 +614,10 @@ final class YamlParser {
 		$blockIndent = $explicit !== null ? $parentIndent + $explicit : null;
 
 		$collected = [];
-		$count     = count($this->lines);
+		$count     = $this->lineCount;
 
 		while ($this->pos < $count) {
-			$entry = $this->lines[$this->pos];
-			$raw   = $entry['raw'];
+			$raw = $this->lines[$this->pos][3];
 
 			if (trim($raw) === '') {
 				$collected[] = '';
@@ -618,12 +626,7 @@ final class YamlParser {
 				continue;
 			}
 
-			$lineIndent = 0;
-			$len        = strlen($raw);
-
-			while ($lineIndent < $len && $raw[$lineIndent] === ' ') {
-				$lineIndent++;
-			}
+			$lineIndent = strspn($raw, ' ');
 
 			if ($lineIndent <= $parentIndent) {
 				break;
@@ -741,6 +744,7 @@ final class YamlParser {
 
 		if ($anchor !== null) {
 			$this->anchors[$anchor] = $result;
+			unset($this->anchorNodeCounts[$anchor]);
 		}
 
 		return $result;
@@ -841,9 +845,9 @@ final class YamlParser {
 	 * @throws YamlException On unbalanced quotes or delimiters.
 	 */
 	private function splitFlowItems(string $inner, int $lineNo): array {
-		$items   = [];
-		$buf     = '';
-		$len     = strlen($inner);
+		$items    = [];
+		$start    = 0;
+		$len      = strlen($inner);
 		$inSingle = false;
 		$inDouble = false;
 		$brackets = 0;
@@ -853,11 +857,8 @@ final class YamlParser {
 			$ch = $inner[$i];
 
 			if ($inSingle) {
-				$buf .= $ch;
-
 				if ($ch === "'") {
 					if ($i + 1 < $len && $inner[$i + 1] === "'") {
-						$buf .= "'";
 						$i++;
 					} else {
 						$inSingle = false;
@@ -868,10 +869,8 @@ final class YamlParser {
 			}
 
 			if ($inDouble) {
-				$buf .= $ch;
-
 				if ($ch === '\\' && $i + 1 < $len) {
-					$buf .= $inner[++$i];
+					$i++;
 				} elseif ($ch === '"') {
 					$inDouble = false;
 				}
@@ -881,32 +880,24 @@ final class YamlParser {
 
 			if ($ch === "'") {
 				$inSingle = true;
-				$buf .= $ch;
 			} elseif ($ch === '"') {
 				$inDouble = true;
-				$buf .= $ch;
 			} elseif ($ch === '[') {
 				$brackets++;
-				$buf .= $ch;
 			} elseif ($ch === ']') {
 				$brackets--;
-				$buf .= $ch;
 			} elseif ($ch === '{') {
 				$braces++;
-				$buf .= $ch;
 			} elseif ($ch === '}') {
 				$braces--;
-				$buf .= $ch;
 			} elseif ($ch === ',' && $brackets === 0 && $braces === 0) {
-				$trimmed = trim($buf);
+				$trimmed = trim(substr($inner, $start, $i - $start));
 
 				if ($trimmed !== '') {
 					$items[] = $trimmed;
 				}
 
-				$buf = '';
-			} else {
-				$buf .= $ch;
+				$start = $i + 1;
 			}
 		}
 
@@ -914,7 +905,7 @@ final class YamlParser {
 			throw new YamlException(sprintf('Line %d: unbalanced quotes or delimiters in flow collection.', $lineNo));
 		}
 
-		$trimmed = trim($buf);
+		$trimmed = trim(substr($inner, $start));
 
 		if ($trimmed !== '') {
 			$items[] = $trimmed;
@@ -934,10 +925,22 @@ final class YamlParser {
 	 * @throws YamlException When an executable or non-safe YAML tag is encountered.
 	 */
 	private function extractPrefixTokens(string $text, int $lineNo, ?string &$anchor, ?string &$tag): string {
-		$remaining = ltrim($text, ' ');
+		if ($text === '') {
+			return '';
+		}
+
+		$first = $text[0];
+
+		if ($first !== ' ' && $first !== '!' && $first !== '&') {
+			return $text;
+		}
+
+		$remaining = $first === ' ' ? ltrim($text, ' ') : $text;
 
 		while ($remaining !== '') {
-			if (str_starts_with($remaining, '!')) {
+			$lead = $remaining[0];
+
+			if ($lead === '!') {
 				$space = strpos($remaining, ' ');
 				$tok   = $space === false ? $remaining : substr($remaining, 0, $space);
 
@@ -951,7 +954,7 @@ final class YamlParser {
 				continue;
 			}
 
-			if (str_starts_with($remaining, '&')) {
+			if ($lead === '&') {
 				$space = strpos($remaining, ' ');
 				$tok   = $space === false ? $remaining : substr($remaining, 0, $space);
 				$name  = substr($tok, 1);
@@ -988,7 +991,7 @@ final class YamlParser {
 		}
 
 		$value = $this->anchors[$name];
-		$cost  = $this->countNodes($value, 0);
+		$cost  = $this->anchorNodeCounts[$name] ??= $this->countNodes($value, 0);
 		$this->expandedNodes += $cost;
 
 		$totalNodes = $this->literalNodes + $this->expandedNodes;
@@ -1095,23 +1098,34 @@ final class YamlParser {
 		}
 
 		$inner = substr($text, 1, -1);
-		$len   = strlen($inner);
-		$out   = '';
 
-		for ($i = 0; $i < $len; $i++) {
-			$ch = $inner[$i];
+		if (!str_contains($inner, '\\')) {
+			return $inner;
+		}
 
-			if ($ch !== '\\') {
-				$out .= $ch;
+		$len = strlen($inner);
+		$out = '';
+		$i   = 0;
 
-				continue;
+		while ($i < $len) {
+			$slash = strpos($inner, '\\', $i);
+
+			if ($slash === false) {
+				$out .= substr($inner, $i);
+
+				break;
 			}
 
-			if ($i + 1 >= $len) {
+			if ($slash > $i) {
+				$out .= substr($inner, $i, $slash - $i);
+			}
+
+			if ($slash + 1 >= $len) {
 				throw new YamlException(sprintf('Line %d: dangling escape in double-quoted string.', $lineNo));
 			}
 
-			$next = $inner[++$i];
+			$i    = $slash + 1;
+			$next = $inner[$i];
 			$out .= match ($next) {
 				'n'  => "\n",
 				'r'  => "\r",
@@ -1125,6 +1139,7 @@ final class YamlParser {
 				'u'  => $this->decodeHexEscape($inner, $i, 4, $lineNo),
 				default => throw new YamlException(sprintf('Line %d: unsupported escape sequence "\\%s".', $lineNo, $next)),
 			};
+			$i++;
 		}
 
 		return $out;
@@ -1191,32 +1206,54 @@ final class YamlParser {
 	 * @return mixed Decoded scalar (null, bool, int, float, or string).
 	 */
 	private function parsePlainScalar(string $text): mixed {
-		if ($text === '~' || $text === 'null' || $text === 'Null' || $text === 'NULL') {
-			return null;
+		if ($text === '') {
+			return '';
 		}
 
-		if ($text === 'true' || $text === 'True' || $text === 'TRUE') {
-			return true;
+		$first = $text[0];
+
+		if ($first === '~' || $first === 'n' || $first === 'N') {
+			if ($text === '~' || $text === 'null' || $text === 'Null' || $text === 'NULL') {
+				return null;
+			}
+
+			return $text;
 		}
 
-		if ($text === 'false' || $text === 'False' || $text === 'FALSE') {
-			return false;
+		if ($first === 't' || $first === 'T') {
+			if ($text === 'true' || $text === 'True' || $text === 'TRUE') {
+				return true;
+			}
+
+			return $text;
 		}
 
-		if (preg_match('/^[+-]?(?:0|[1-9][0-9]*)$/D', $text) === 1) {
-			return (int) $text;
+		if ($first === 'f' || $first === 'F') {
+			if ($text === 'false' || $text === 'False' || $text === 'FALSE') {
+				return false;
+			}
+
+			return $text;
 		}
 
-		if (preg_match('/^0x[0-9a-fA-F]+$/D', $text) === 1) {
-			return (int) hexdec(substr($text, 2));
-		}
+		if (($first >= '0' && $first <= '9') || $first === '+' || $first === '-' || $first === '.') {
+			if (preg_match('/^[+-]?(?:0|[1-9][0-9]*)$/D', $text) === 1) {
+				return (int) $text;
+			}
 
-		if (preg_match('/^0o[0-7]+$/D', $text) === 1) {
-			return (int) octdec(substr($text, 2));
-		}
+			if ($first === '0') {
+				if (preg_match('/^0x[0-9a-fA-F]+$/D', $text) === 1) {
+					return (int) hexdec(substr($text, 2));
+				}
 
-		if (preg_match('/^[+-]?(?:[0-9]+\.[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/D', $text) === 1) {
-			return (float) $text;
+				if (preg_match('/^0o[0-7]+$/D', $text) === 1) {
+					return (int) octdec(substr($text, 2));
+				}
+			}
+
+			if (preg_match('/^[+-]?(?:[0-9]+\.[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/D', $text) === 1) {
+				return (float) $text;
+			}
 		}
 
 		return $text;
@@ -1225,17 +1262,41 @@ final class YamlParser {
 	/**
 	 * Locate the mapping key/value delimiter colon outside quotes and flow brackets.
 	 *
+	 * Uses a C-level strcspn() fast path for plain unquoted keys before falling
+	 * back to full quote/bracket-aware scanning.
+	 *
 	 * @param string $text Trimmed YAML line text.
 	 * @return ?int Byte offset of the colon, or null if not a mapping entry.
 	 */
 	private function findMappingColon(string $text): ?int {
-		$len      = strlen($text);
+		$len = strlen($text);
+
+		if ($len === 0) {
+			return null;
+		}
+
+		$fastPos = strcspn($text, "':\"[]{}#");
+
+		if ($fastPos === $len) {
+			return null;
+		}
+
+		$hit = $text[$fastPos];
+
+		if ($hit === ':' && ($fastPos + 1 === $len || $text[$fastPos + 1] === ' ')) {
+			return $fastPos;
+		}
+
+		if ($hit === '#' && ($fastPos === 0 || $text[$fastPos - 1] === ' ')) {
+			return null;
+		}
+
 		$inSingle = false;
 		$inDouble = false;
 		$brackets = 0;
 		$braces   = 0;
 
-		for ($i = 0; $i < $len; $i++) {
+		for ($i = $fastPos; $i < $len; $i++) {
 			$ch = $text[$i];
 
 			if ($inSingle) {
@@ -1291,6 +1352,10 @@ final class YamlParser {
 	 * @return string Text without trailing comments.
 	 */
 	private function stripInlineComment(string $text): string {
+		if (!str_contains($text, '#')) {
+			return rtrim($text);
+		}
+
 		$len      = strlen($text);
 		$inSingle = false;
 		$inDouble = false;
@@ -1339,6 +1404,10 @@ final class YamlParser {
 	 * @return bool
 	 */
 	private function isBlockScalarHeader(string $text): bool {
+		if ($text === '' || ($text[0] !== '|' && $text[0] !== '>')) {
+			return false;
+		}
+
 		$clean = trim($this->stripInlineComment($text));
 
 		return preg_match('/^[|>][+-]?[1-9]?$/D', $clean) === 1;

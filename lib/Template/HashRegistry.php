@@ -63,6 +63,33 @@ final class HashRegistry {
 	];
 
 	/**
+	 * Reverse lookup map from 2-hex-digit Cacti type code to object type name.
+	 *
+	 * @var array<int|string, string>
+	 */
+	private const CODE_TO_TYPE = [
+		'00' => 'graph_template',
+		'01' => 'data_template',
+		'02' => 'host_template',
+		'03' => 'data_input_method',
+		'04' => 'data_query',
+		'05' => 'cdef',
+		'06' => 'gprint_preset',
+		'07' => 'data_input_field',
+		'08' => 'data_template_item',
+		'09' => 'graph_template_input',
+		'10' => 'graph_template_item',
+		'11' => 'data_query_graph',
+		'12' => 'data_query_sv_graph',
+		'13' => 'data_query_sv_data_source',
+		'14' => 'cdef_item',
+		'15' => 'round_robin_archive',
+		'18' => 'vdef',
+		'19' => 'vdef_item',
+		'20' => 'data_source_profile',
+	];
+
+	/**
 	 * Built-in Cacti system data input method hashes that may be referenced
 	 * without being redefined inside an exported bundle.
 	 *
@@ -73,6 +100,18 @@ final class HashRegistry {
 		'bf566c869ac6443b0c75d1c32b5a350e' => 'system/get_snmp_data_indexed',
 		'80e9e4c4191a5da189ae26d0e237f015' => 'system/get_script_data_indexed',
 		'332111d8b54ac8ce939af87a7eac0c06' => 'system/get_script_server_data_indexed',
+	];
+
+	/**
+	 * Reverse lookup map from built-in system ref name to 32-hex Cacti hash.
+	 *
+	 * @var array<string, string>
+	 */
+	private const SYSTEM_REF_TO_HASH = [
+		'system/get_snmp_data'                 => '3eb92bb845b9660a7445cf9740726522',
+		'system/get_snmp_data_indexed'         => 'bf566c869ac6443b0c75d1c32b5a350e',
+		'system/get_script_data_indexed'       => '80e9e4c4191a5da189ae26d0e237f015',
+		'system/get_script_server_data_indexed' => '332111d8b54ac8ce939af87a7eac0c06',
 	];
 
 	/**
@@ -103,14 +142,23 @@ final class HashRegistry {
 	 * @return ?array{type: string, typeCode: string, versionCode: string, hash: string} Parsed components or null if not a Cacti hash.
 	 */
 	public static function parseTag(string $tag): ?array {
-		if (preg_match('/^hash_([0-9a-f]{2})([0-9a-f]{4})([0-9a-f]{32})$/iD', trim($tag), $matches) !== 1) {
+		$trimmed = trim($tag);
+
+		if (strlen($trimmed) !== 43 || strncasecmp($trimmed, 'hash_', 5) !== 0) {
 			return null;
 		}
 
-		$typeCode    = strtolower($matches[1]);
-		$versionCode = strtolower($matches[2]);
-		$hash        = strtolower($matches[3]);
-		$type        = self::typeNameForCode($typeCode);
+		$hex = substr($trimmed, 5);
+
+		if (!ctype_xdigit($hex)) {
+			return null;
+		}
+
+		$lower       = strtolower($hex);
+		$typeCode    = substr($lower, 0, 2);
+		$versionCode = substr($lower, 2, 4);
+		$hash        = substr($lower, 6);
+		$type        = self::CODE_TO_TYPE[$typeCode] ?? null;
 
 		if ($type === null) {
 			return null;
@@ -131,15 +179,7 @@ final class HashRegistry {
 	 * @return ?string Type name or null if unrecognized.
 	 */
 	public static function typeNameForCode(string $typeCode): ?string {
-		$lower = strtolower($typeCode);
-
-		foreach (self::TYPE_CODES as $name => $code) {
-			if ($code === $lower) {
-				return $name;
-			}
-		}
-
-		return null;
+		return self::CODE_TO_TYPE[strtolower($typeCode)] ?? null;
 	}
 
 	/**
@@ -263,14 +303,20 @@ final class HashRegistry {
 			? strtolower($explicitHash)
 			: self::deriveHash($namespace, $type, $ref);
 
-		if (preg_match('/^[0-9a-f]{32}$/D', $hash) !== 1) {
+		if (strlen($hash) !== 32 || !ctype_xdigit($hash)) {
 			throw new YamlException(sprintf('Invalid cactiHash "%s" for ref "%s".', $hash, $ref));
+		}
+
+		$lowerVer = strtolower($versionCode);
+
+		if (strlen($lowerVer) !== 4 || !ctype_xdigit($lowerVer)) {
+			throw new YamlException(sprintf('Invalid 4-hex Cacti version code "%s".', $versionCode));
 		}
 
 		$meta = [
 			'type'        => $type,
 			'typeCode'    => self::TYPE_CODES[$type],
-			'versionCode' => strtolower($versionCode),
+			'versionCode' => $lowerVer,
 			'hash'        => $hash,
 		];
 
@@ -309,13 +355,11 @@ final class HashRegistry {
 		if (isset($this->refToMeta[$ref])) {
 			$meta = $this->refToMeta[$ref];
 
-			return self::formatTag($meta['type'], $meta['hash'], $meta['versionCode']);
+			return 'hash_' . $meta['typeCode'] . $meta['versionCode'] . $meta['hash'];
 		}
 
-		foreach (self::SYSTEM_DATA_INPUTS as $hash => $sysRef) {
-			if ($sysRef === $ref) {
-				return self::formatTag('data_input_method', $hash, $defaultVersionCode);
-			}
+		if (isset(self::SYSTEM_REF_TO_HASH[$ref])) {
+			return self::formatTag('data_input_method', self::SYSTEM_REF_TO_HASH[$ref], $defaultVersionCode);
 		}
 
 		throw new YamlException(sprintf('Unresolved symbolic template reference "ref:%s".', $ref));

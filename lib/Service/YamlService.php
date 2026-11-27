@@ -69,6 +69,21 @@ final class YamlService {
 	private readonly mixed $cascApplyDelegate;
 
 	/**
+	 * Most recent compile duration in milliseconds measured in this service instance.
+	 */
+	private ?float $lastCompileMs = null;
+
+	/**
+	 * Most recent fragment merge duration in milliseconds measured in this service instance.
+	 */
+	private ?float $lastMergeMs = null;
+
+	/**
+	 * Most recent validation error count observed in this service instance.
+	 */
+	private ?int $lastValidationErrors = null;
+
+	/**
 	 * Construct a YamlService instance.
 	 *
 	 * @param Settings $settings Active plugin settings.
@@ -131,6 +146,33 @@ final class YamlService {
 	}
 
 	/**
+	 * Return the most recent compile duration in milliseconds, or null if not yet measured.
+	 *
+	 * @return ?float
+	 */
+	public function lastCompileMs(): ?float {
+		return $this->lastCompileMs;
+	}
+
+	/**
+	 * Return the most recent fragment merge duration in milliseconds, or null if not yet measured.
+	 *
+	 * @return ?float
+	 */
+	public function lastMergeMs(): ?float {
+		return $this->lastMergeMs;
+	}
+
+	/**
+	 * Return the most recent validation error count, or null if not yet measured.
+	 *
+	 * @return ?int
+	 */
+	public function lastValidationErrors(): ?int {
+		return $this->lastValidationErrors;
+	}
+
+	/**
 	 * Decompile either a native Cacti `<cacti>` template XML or `<interface>`
 	 * Data Query XML string into canonical YAML 1.2.
 	 *
@@ -163,11 +205,13 @@ final class YamlService {
 	 * @throws YamlException When YAML syntax, validation, or compilation fails.
 	 */
 	public function compileYaml(string $yaml): array {
-		$doc  = YamlParser::parseMap($yaml);
-		$kind = is_string($doc['kind'] ?? null) ? $doc['kind'] : '';
+		$started = hrtime(true);
+		$doc     = YamlParser::parseMap($yaml);
+		$kind    = is_string($doc['kind'] ?? null) ? $doc['kind'] : '';
 
 		if ($kind === 'SnmpDataQuery' || $kind === 'ScriptDataQuery') {
-			$compiled = DataQueryCompiler::compileArray($doc);
+			$compiled            = DataQueryCompiler::compileArray($doc);
+			$this->lastCompileMs = round((hrtime(true) - $started) / 1e6, 2);
 
 			return [
 				'kind'       => $compiled['kind'],
@@ -177,7 +221,8 @@ final class YamlService {
 			];
 		}
 
-		$compiled = TemplateCompiler::compileArray($doc);
+		$compiled            = TemplateCompiler::compileArray($doc);
+		$this->lastCompileMs = round((hrtime(true) - $started) / 1e6, 2);
 
 		return [
 			'kind'       => TemplateDecompiler::KIND,
@@ -201,10 +246,14 @@ final class YamlService {
 		?MergePolicy $policy = null,
 		string $listMode = MergePolicy::LIST_MERGE_BY_KEY,
 	): array {
+		$started      = hrtime(true);
 		$activePolicy = $policy ?? $this->settings->mergePolicy;
 		$merged       = FragmentMerger::mergeSources($sources, $activePolicy, $listMode);
 		$redacted     = PlaceholderParser::redact($merged['document']);
 		$redactedYaml = YamlEmitter::emit($redacted, false);
+		$planHash     = hash('sha256', YamlEmitter::emit($merged['document'], true));
+
+		$this->lastMergeMs = round((hrtime(true) - $started) / 1e6, 2);
 
 		return [
 			'document'     => $merged['document'],
@@ -212,7 +261,7 @@ final class YamlService {
 			'files'        => $merged['files'],
 			'provenance'   => $merged['provenance'],
 			'placeholders' => $merged['placeholders'],
-			'planHash'     => hash('sha256', YamlEmitter::emit($merged['document'], true)),
+			'planHash'     => $planHash,
 		];
 	}
 
@@ -247,7 +296,8 @@ final class YamlService {
 	public function generateSchema(): array {
 		$discovered = $this->discoverSchemas();
 		$schema     = SchemaGenerator::generate($discovered);
-		$json       = SchemaGenerator::toJson($discovered);
+		$encoded    = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		$json       = (is_string($encoded) ? $encoded : '{}') . "\n";
 
 		return [
 			'schema'  => $schema,
@@ -282,44 +332,34 @@ final class YamlService {
 		try {
 			$merged = $this->mergeSources($sources, $policy);
 		} catch (YamlException $e) {
+			$lines                      = $e->lines();
+			$this->lastValidationErrors = count($lines);
+
 			return [
 				'valid'        => false,
 				'kind'         => 'unknown',
 				'files'        => [],
 				'planHash'     => '',
-				'errors'       => $e->lines(),
+				'errors'       => $lines,
 				'placeholders' => [],
 			];
 		}
 
-		$doc    = $merged['document'];
-		$kind   = is_string($doc['kind'] ?? null) ? $doc['kind'] : 'CactiConfig';
-		$errors = [];
-
-		if ($kind === 'SnmpDataQuery' || $kind === 'ScriptDataQuery') {
-			$errors = DataQueryValidator::validate($doc);
-		} elseif ($kind === 'CactiTemplateBundle') {
-			try {
-				TemplateCompiler::compileArray($doc);
-			} catch (YamlException $e) {
-				$errors = $e->lines();
-			}
-		} else {
-			$errors = CrossParameterValidator::validate($doc);
-		}
+		$validated                  = $this->validateDocument($merged['document']);
+		$this->lastValidationErrors = count($validated['errors']);
 
 		return [
-			'valid'        => $errors === [],
-			'kind'         => $kind,
+			'valid'        => $validated['errors'] === [],
+			'kind'         => $validated['kind'],
 			'files'        => $merged['files'],
 			'planHash'     => $merged['planHash'],
-			'errors'       => $errors,
+			'errors'       => $validated['errors'],
 			'placeholders' => $merged['placeholders'],
 		];
 	}
 
 	/**
-	 * Execute a dry-run or confirmed JCasC-style reload pipeline.
+	 * Execute a dry-run or confirmed JCasC-style reload pipeline without redundant re-merging.
 	 *
 	 * @param string|list<string> $sources Fragment source path(s).
 	 * @param bool $dryRun When true, only compute plan hash and redacted preview.
@@ -337,21 +377,37 @@ final class YamlService {
 		string $channel = 'cli',
 		?MergePolicy $policy = null,
 	): array {
-		$validation = $this->validateSource($sources, $policy);
+		try {
+			$merged = $this->mergeSources($sources, $policy);
+		} catch (YamlException $e) {
+			$lines                      = $e->lines();
+			$this->lastValidationErrors = count($lines);
 
-		if (!$validation['valid']) {
 			return [
 				'succeeded'    => false,
 				'dryRun'       => $dryRun,
-				'planHash'     => $validation['planHash'],
-				'files'        => $validation['files'],
+				'planHash'     => '',
+				'files'        => [],
 				'redactedYaml' => '',
 				'message'      => 'Validation failed; reload aborted.',
-				'errors'       => $validation['errors'],
+				'errors'       => $lines,
 			];
 		}
 
-		$merged = $this->mergeSources($sources, $policy);
+		$validated                  = $this->validateDocument($merged['document']);
+		$this->lastValidationErrors = count($validated['errors']);
+
+		if ($validated['errors'] !== []) {
+			return [
+				'succeeded'    => false,
+				'dryRun'       => $dryRun,
+				'planHash'     => $merged['planHash'],
+				'files'        => $merged['files'],
+				'redactedYaml' => '',
+				'message'      => 'Validation failed; reload aborted.',
+				'errors'       => $validated['errors'],
+			];
+		}
 
 		if ($dryRun) {
 			return [
@@ -389,6 +445,7 @@ final class YamlService {
 					'files'   => $merged['files'],
 					'message' => $result['message'],
 					'errors'  => $result['errors'],
+					'mergeMs' => $this->lastMergeMs ?? 0.0,
 				]
 			);
 
@@ -404,13 +461,17 @@ final class YamlService {
 		}
 
 		// Standalone apply mode: handle SnmpDataQuery / ScriptDataQuery or record validated state.
-		$doc  = $merged['document'];
-		$kind = is_string($doc['kind'] ?? null) ? $doc['kind'] : 'CactiConfig';
+		$doc       = $merged['document'];
+		$kind      = $validated['kind'];
+		$compileMs = 0.0;
 
 		if (($kind === 'SnmpDataQuery' || $kind === 'ScriptDataQuery') && $this->cactiBasePath !== '' && is_dir($this->cactiBasePath)) {
-			$compiled   = DataQueryCompiler::compileArray($doc);
-			$targetPath = PathGuard::resolveConfined($compiled['outputFile'], $this->cactiBasePath, false);
-			$sha        = PathGuard::writeAtomic($targetPath, $compiled['xml']);
+			$compileStart        = hrtime(true);
+			$compiled            = DataQueryCompiler::compileArray($doc);
+			$compileMs           = round((hrtime(true) - $compileStart) / 1e6, 2);
+			$this->lastCompileMs = $compileMs;
+			$targetPath          = PathGuard::resolveConfined($compiled['outputFile'], $this->cactiBasePath, false);
+			$sha                 = PathGuard::writeAtomic($targetPath, $compiled['xml']);
 			$this->repository->upsertQuery($compiled['name'], $compiled['kind'], $compiled['outputFile'], $sha);
 		}
 
@@ -424,6 +485,8 @@ final class YamlService {
 				'files'      => $merged['files'],
 				'kind'       => $kind,
 				'standalone' => true,
+				'mergeMs'    => $this->lastMergeMs ?? 0.0,
+				'compileMs'  => $compileMs,
 			]
 		);
 
@@ -435,6 +498,37 @@ final class YamlService {
 			'redactedYaml' => $merged['redactedYaml'],
 			'message'      => sprintf('Applied YAML reload %s in standalone mode.', substr($merged['planHash'], 0, 12)),
 			'errors'       => [],
+		];
+	}
+
+	/**
+	 * Validate a merged YAML document according to its declared kind.
+	 *
+	 * @param array<string, mixed> $doc Merged YAML mapping.
+	 * @return array{kind: string, errors: list<string>}
+	 */
+	private function validateDocument(array $doc): array {
+		$kind   = is_string($doc['kind'] ?? null) ? $doc['kind'] : 'CactiConfig';
+		$errors = [];
+
+		if ($kind === 'SnmpDataQuery' || $kind === 'ScriptDataQuery') {
+			$errors = DataQueryValidator::validate($doc);
+		} elseif ($kind === 'CactiTemplateBundle') {
+			$started = hrtime(true);
+
+			try {
+				TemplateCompiler::compileArray($doc);
+				$this->lastCompileMs = round((hrtime(true) - $started) / 1e6, 2);
+			} catch (YamlException $e) {
+				$errors = $e->lines();
+			}
+		} else {
+			$errors = CrossParameterValidator::validate($doc);
+		}
+
+		return [
+			'kind'   => $kind,
+			'errors' => $errors,
 		];
 	}
 

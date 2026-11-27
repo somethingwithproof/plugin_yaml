@@ -172,7 +172,9 @@ final class FragmentMerger {
 			);
 		}
 
-		$inspection = PlaceholderParser::inspect($merged);
+		/** @var array<string, mixed> $finalized */
+		$finalized  = self::materializeIndexedLists($merged);
+		$inspection = PlaceholderParser::inspect($finalized);
 
 		if ($inspection['errors'] !== []) {
 			throw new YamlException(
@@ -182,7 +184,7 @@ final class FragmentMerger {
 		}
 
 		return [
-			'document'     => $merged,
+			'document'     => $finalized,
 			'provenance'   => $provenance,
 			'placeholders' => $inspection['references'],
 		];
@@ -234,11 +236,22 @@ final class FragmentMerger {
 				continue;
 			}
 
-			if (is_array($existing) && array_is_list($existing) && is_array($value) && array_is_list($value)) {
-				$base[$keyStr] = self::mergeLists($existing, $value, $path, $source, $policy, $listMode, $provenance, $conflicts);
+			if ($existing instanceof IndexedList && is_array($value) && array_is_list($value)) {
+				$base[$keyStr]     = self::mergeIntoIndexedList($existing, $value, $path, $source, $policy, $listMode, $provenance, $conflicts);
 				$provenance[$path] = $source;
 
 				continue;
+			}
+
+			if (is_array($existing) && array_is_list($existing) && is_array($value) && array_is_list($value)) {
+				$base[$keyStr]     = self::mergeLists($existing, $value, $path, $source, $policy, $listMode, $provenance, $conflicts);
+				$provenance[$path] = $source;
+
+				continue;
+			}
+
+			if ($existing instanceof IndexedList) {
+				$existing = $existing->toList();
 			}
 
 			if ($existing === $value) {
@@ -260,6 +273,65 @@ final class FragmentMerger {
 	}
 
 	/**
+	 * Merge an incoming list into an already hash-indexed list in O(M) time.
+	 *
+	 * @param IndexedList $existing Persistent indexed list accumulator.
+	 * @param list<mixed> $incoming Incoming fragment list.
+	 * @param string $path Dotted path for diagnostics.
+	 * @param string $source Fragment source identifier.
+	 * @param MergePolicy $policy Conflict policy.
+	 * @param string $listMode List merge mode.
+	 * @param array<string, string> $provenance Provenance table.
+	 * @param list<string> $conflicts Collected strict conflicts.
+	 * @return IndexedList|list<mixed> Updated indexed list or fallback plain list.
+	 */
+	private static function mergeIntoIndexedList(
+		IndexedList $existing,
+		array $incoming,
+		string $path,
+		string $source,
+		MergePolicy $policy,
+		string $listMode,
+		array &$provenance,
+		array &$conflicts,
+	): IndexedList|array {
+		if ($listMode === MergePolicy::LIST_REPLACE) {
+			return $incoming;
+		}
+
+		if ($listMode === MergePolicy::LIST_APPEND) {
+			return array_merge($existing->toList(), $incoming);
+		}
+
+		$naturalKey = $existing->naturalKey;
+
+		// Verify incoming items share the active natural key before mutating.
+		foreach ($incoming as $item) {
+			if (!self::isAssocArray($item) || !isset($item[$naturalKey]) || !is_scalar($item[$naturalKey])) {
+				return self::mergeLists($existing->toList(), $incoming, $path, $source, $policy, $listMode, $provenance, $conflicts);
+			}
+		}
+
+		foreach ($incoming as $item) {
+			/** @var array<string, mixed> $itemMap */
+			$itemMap  = $item;
+			$rawKey   = $itemMap[$naturalKey];
+			$id       = is_scalar($rawKey) ? (string) $rawKey : '';
+			$slot     = "\0" . $id;
+			$itemPath = $path . '[' . $naturalKey . '=' . $id . ']';
+
+			if (isset($existing->items[$slot])) {
+				$existing->items[$slot] = self::mergeMaps($existing->items[$slot], $itemMap, $itemPath, $source, $policy, $listMode, $provenance, $conflicts);
+			} else {
+				$existing->items[$slot] = $itemMap;
+				self::recordProvenance($itemPath, $itemMap, $source, $provenance);
+			}
+		}
+
+		return $existing;
+	}
+
+	/**
 	 * Merge two sequential lists according to the configured list merge mode.
 	 *
 	 * @param list<mixed> $base Existing list.
@@ -270,7 +342,7 @@ final class FragmentMerger {
 	 * @param string $listMode List merge mode.
 	 * @param array<string, string> $provenance Provenance table.
 	 * @param list<string> $conflicts Collected strict conflicts.
-	 * @return list<mixed> Merged list.
+	 * @return IndexedList|list<mixed> Merged list or indexed accumulator.
 	 */
 	private static function mergeLists(
 		array $base,
@@ -281,7 +353,7 @@ final class FragmentMerger {
 		string $listMode,
 		array &$provenance,
 		array &$conflicts,
-	): array {
+	): IndexedList|array {
 		if ($listMode === MergePolicy::LIST_REPLACE) {
 			return $incoming;
 		}
@@ -297,66 +369,86 @@ final class FragmentMerger {
 		}
 
 		$indexed = [];
-		$order   = [];
 
 		foreach ($base as $item) {
 			if (!self::isAssocArray($item) || !isset($item[$naturalKey]) || !is_scalar($item[$naturalKey])) {
 				return array_merge($base, $incoming);
 			}
 
-			$id = (string) $item[$naturalKey];
+			$id   = (string) $item[$naturalKey];
+			$slot = "\0" . $id;
 			/** @var array<string, mixed> $itemMap */
-			$itemMap      = $item;
-			$indexed[$id] = $itemMap;
-			$order[]      = $id;
+			$itemMap        = $item;
+			$indexed[$slot] = $itemMap;
 		}
 
-		foreach ($incoming as $item) {
-			if (!self::isAssocArray($item) || !isset($item[$naturalKey]) || !is_scalar($item[$naturalKey])) {
-				return array_merge($base, $incoming);
-			}
+		$accumulator = new IndexedList($naturalKey, $indexed);
 
-			$id       = (string) $item[$naturalKey];
-			$itemPath = $path . '[' . $naturalKey . '=' . $id . ']';
-			/** @var array<string, mixed> $itemMap */
-			$itemMap = $item;
-
-			if (isset($indexed[$id])) {
-				$indexed[$id] = self::mergeMaps($indexed[$id], $itemMap, $itemPath, $source, $policy, $listMode, $provenance, $conflicts);
-			} else {
-				$indexed[$id] = $itemMap;
-				$order[]      = $id;
-				self::recordProvenance($itemPath, $itemMap, $source, $provenance);
-			}
-		}
-
-		$result = [];
-
-		foreach ($order as $id) {
-			$result[] = $indexed[$id];
-		}
-
-		return $result;
+		return self::mergeIntoIndexedList($accumulator, $incoming, $path, $source, $policy, $listMode, $provenance, $conflicts);
 	}
 
 	/**
-	 * Detect a shared natural key across two lists of associative maps.
+	 * Recursively convert internal IndexedList accumulators back into plain lists.
+	 *
+	 * @param mixed $node Merged tree node.
+	 * @return mixed Materialized tree node with plain PHP lists.
+	 */
+	private static function materializeIndexedLists(mixed $node): mixed {
+		if ($node instanceof IndexedList) {
+			$list = $node->toList();
+
+			foreach ($list as $idx => $item) {
+				$list[$idx] = self::materializeIndexedLists($item);
+			}
+
+			return $list;
+		}
+
+		if (is_array($node)) {
+			foreach ($node as $key => $value) {
+				if ($value instanceof IndexedList || is_array($value)) {
+					$node[$key] = self::materializeIndexedLists($value);
+				}
+			}
+		}
+
+		return $node;
+	}
+
+	/**
+	 * Detect a shared natural key across two lists of associative maps without copying arrays.
 	 *
 	 * @param list<mixed> $base Base list.
 	 * @param list<mixed> $incoming Incoming list.
 	 * @return ?string Natural key name or null when lists are not keyed object lists.
 	 */
 	private static function detectNaturalKey(array $base, array $incoming): ?string {
-		$all = array_merge($base, $incoming);
+		$first = $base !== [] ? $base[0] : ($incoming !== [] ? $incoming[0] : null);
 
-		if ($all === []) {
+		if (!self::isAssocArray($first)) {
 			return null;
 		}
 
 		foreach (self::DEFAULT_NATURAL_KEYS as $candidate) {
+			if (!isset($first[$candidate]) || !is_scalar($first[$candidate])) {
+				continue;
+			}
+
 			$matched = true;
 
-			foreach ($all as $item) {
+			foreach ($base as $item) {
+				if (!self::isAssocArray($item) || !isset($item[$candidate]) || !is_scalar($item[$candidate])) {
+					$matched = false;
+
+					break;
+				}
+			}
+
+			if (!$matched) {
+				continue;
+			}
+
+			foreach ($incoming as $item) {
 				if (!self::isAssocArray($item) || !isset($item[$candidate]) || !is_scalar($item[$candidate])) {
 					$matched = false;
 

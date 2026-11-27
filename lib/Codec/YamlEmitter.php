@@ -26,26 +26,36 @@ namespace Somethingwithproof\Yaml\Codec;
  */
 final class YamlEmitter {
 	/**
-	 * Keywords that must be quoted as strings to avoid ambiguous scalar parsing.
+	 * O(1) lookup set of keywords that must be quoted as strings to avoid ambiguous scalar parsing.
 	 *
-	 * @var list<string>
+	 * @var array<string, true>
 	 */
-	private const RESERVED_SCALARS = [
-		'null',
-		'true',
-		'false',
-		'~',
-		'yes',
-		'no',
-		'on',
-		'off',
-		'y',
-		'n',
-		'.nan',
-		'.inf',
-		'-.inf',
-		'+.inf',
+	private const RESERVED_SCALAR_MAP = [
+		'null'  => true,
+		'true'  => true,
+		'false' => true,
+		'~'     => true,
+		'yes'   => true,
+		'no'    => true,
+		'on'    => true,
+		'off'   => true,
+		'y'     => true,
+		'n'     => true,
+		'.nan'  => true,
+		'.inf'  => true,
+		'-.inf' => true,
+		'+.inf' => true,
 	];
+
+	/**
+	 * Characters permitted after the first character of an unquoted mapping key.
+	 */
+	private const KEY_TAIL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-';
+
+	/**
+	 * Leading characters that require quoting for a plain YAML scalar.
+	 */
+	private const SPECIAL_LEADING = "-?:,[]{}#&*!|>'\"%@`";
 
 	/**
 	 * Emit a PHP array or scalar as canonical YAML 1.2 text.
@@ -55,96 +65,100 @@ final class YamlEmitter {
 	 * @return string Canonical YAML 1.2 text ending in a single newline.
 	 */
 	public static function emit(mixed $data, bool $sortKeys = false): string {
-		$body = self::renderValue($data, 0, $sortKeys);
+		$out = [];
+		self::renderValueInto($data, 0, $sortKeys, $out);
 
-		return rtrim($body, "\n") . "\n";
+		return rtrim(implode("\n", $out), "\n") . "\n";
 	}
 
 	/**
-	 * Render any PHP value at the given indentation depth.
+	 * Render any PHP value directly into the shared line buffer without intermediate joins/splits.
 	 *
 	 * @param mixed $value Value to render.
 	 * @param int $indent Number of leading spaces.
 	 * @param bool $sortKeys Sort mapping keys lexically when true.
-	 * @return string Rendered YAML fragment.
+	 * @param list<string> $out Output line accumulator.
+	 * @return void
 	 */
-	private static function renderValue(mixed $value, int $indent, bool $sortKeys): string {
+	private static function renderValueInto(mixed $value, int $indent, bool $sortKeys, array &$out): void {
 		if (!is_array($value)) {
-			return str_repeat(' ', $indent) . self::formatScalar($value, $indent);
+			$out[] = str_repeat(' ', $indent) . self::formatScalar($value, $indent);
+
+			return;
 		}
 
 		if ($value === []) {
-			return str_repeat(' ', $indent) . '[]';
+			$out[] = str_repeat(' ', $indent) . '[]';
+
+			return;
 		}
 
 		if (array_is_list($value)) {
-			return self::renderSequence($value, $indent, $sortKeys);
+			self::renderSequenceInto($value, $indent, $sortKeys, $out);
+
+			return;
 		}
 
-		return self::renderMapping($value, $indent, $sortKeys);
+		self::renderMappingInto($value, $indent, $sortKeys, $out);
 	}
 
 	/**
-	 * Render a sequential PHP list as a YAML block sequence.
+	 * Render a sequential PHP list as a YAML block sequence into the shared line buffer.
 	 *
 	 * @param list<mixed> $list List items.
 	 * @param int $indent Indentation in spaces.
 	 * @param bool $sortKeys Sort nested mapping keys when true.
-	 * @return string Rendered YAML sequence.
+	 * @param list<string> $out Output line accumulator.
+	 * @return void
 	 */
-	private static function renderSequence(array $list, int $indent, bool $sortKeys): string {
-		$lines  = [];
+	private static function renderSequenceInto(array $list, int $indent, bool $sortKeys, array &$out): void {
 		$prefix = str_repeat(' ', $indent);
 
 		foreach ($list as $item) {
 			if (!is_array($item)) {
 				if (is_string($item) && str_contains($item, "\n")) {
-					$lines[] = $prefix . '- ' . self::formatBlockString($item, $indent + 2);
+					$out[] = $prefix . '- ' . self::formatBlockString($item, $indent + 2);
 				} else {
-					$lines[] = $prefix . '- ' . self::formatScalar($item, $indent + 2);
+					$out[] = $prefix . '- ' . self::formatScalar($item, $indent + 2);
 				}
 
 				continue;
 			}
 
 			if ($item === []) {
-				$lines[] = $prefix . '- []';
+				$out[] = $prefix . '- []';
 
 				continue;
 			}
 
 			if (!array_is_list($item)) {
-				$nested    = self::renderMapping($item, $indent + 2, $sortKeys);
-				$subLines  = explode("\n", $nested);
-				$firstLine = ltrim($subLines[0]);
-				$lines[]   = $prefix . '- ' . $firstLine;
+				$startIdx = count($out);
+				self::renderMappingInto($item, $indent + 2, $sortKeys, $out);
 
-				for ($i = 1, $total = count($subLines); $i < $total; $i++) {
-					$lines[] = $subLines[$i];
+				if (isset($out[$startIdx])) {
+					$out[$startIdx] = $prefix . '- ' . ltrim($out[$startIdx], ' ');
 				}
 			} else {
-				$lines[] = $prefix . '-';
-				$lines[] = self::renderSequence($item, $indent + 2, $sortKeys);
+				$out[] = $prefix . '-';
+				self::renderSequenceInto($item, $indent + 2, $sortKeys, $out);
 			}
 		}
-
-		return implode("\n", $lines);
 	}
 
 	/**
-	 * Render an associative PHP array as a YAML block mapping.
+	 * Render an associative PHP array as a YAML block mapping into the shared line buffer.
 	 *
 	 * @param array<int|string, mixed> $map Associative map.
 	 * @param int $indent Indentation in spaces.
 	 * @param bool $sortKeys Sort keys lexically when true.
-	 * @return string Rendered YAML mapping.
+	 * @param list<string> $out Output line accumulator.
+	 * @return void
 	 */
-	private static function renderMapping(array $map, int $indent, bool $sortKeys): string {
+	private static function renderMappingInto(array $map, int $indent, bool $sortKeys, array &$out): void {
 		if ($sortKeys) {
 			ksort($map, SORT_STRING);
 		}
 
-		$lines  = [];
 		$prefix = str_repeat(' ', $indent);
 
 		foreach ($map as $key => $val) {
@@ -152,25 +166,23 @@ final class YamlEmitter {
 
 			if (!is_array($val)) {
 				if (is_string($val) && str_contains($val, "\n")) {
-					$lines[] = $prefix . $encodedKey . ': ' . self::formatBlockString($val, $indent + 2);
+					$out[] = $prefix . $encodedKey . ': ' . self::formatBlockString($val, $indent + 2);
 				} else {
-					$lines[] = $prefix . $encodedKey . ': ' . self::formatScalar($val, $indent + 2);
+					$out[] = $prefix . $encodedKey . ': ' . self::formatScalar($val, $indent + 2);
 				}
 
 				continue;
 			}
 
 			if ($val === []) {
-				$lines[] = $prefix . $encodedKey . ': []';
+				$out[] = $prefix . $encodedKey . ': []';
 
 				continue;
 			}
 
-			$lines[] = $prefix . $encodedKey . ':';
-			$lines[] = self::renderValue($val, $indent + 2, $sortKeys);
+			$out[] = $prefix . $encodedKey . ':';
+			self::renderValueInto($val, $indent + 2, $sortKeys, $out);
 		}
-
-		return implode("\n", $lines);
 	}
 
 	/**
@@ -180,8 +192,18 @@ final class YamlEmitter {
 	 * @return string Safe YAML key token.
 	 */
 	private static function formatKey(string $key): string {
-		if (preg_match('/^[A-Za-z_][A-Za-z0-9_.-]*$/D', $key) === 1 && !in_array(strtolower($key), self::RESERVED_SCALARS, true)) {
-			return $key;
+		$len = strlen($key);
+
+		if ($len > 0) {
+			$first = $key[0];
+
+			if (
+				(($first >= 'a' && $first <= 'z') || ($first >= 'A' && $first <= 'Z') || $first === '_')
+				&& strspn($key, self::KEY_TAIL_CHARS, 1) === $len - 1
+				&& !isset(self::RESERVED_SCALAR_MAP[strtolower($key)])
+			) {
+				return $key;
+			}
 		}
 
 		return self::quoteString($key);
@@ -236,15 +258,20 @@ final class YamlEmitter {
 	 * @return string Block scalar YAML representation.
 	 */
 	private static function formatBlockString(string $value, int $indent): string {
-		$normalized = str_replace(["\r\n", "\r"], "\n", $value);
+		$normalized = str_contains($value, "\r") ? str_replace(["\r\n", "\r"], "\n", $value) : $value;
 		$hasTrail   = str_ends_with($normalized, "\n");
 		$body       = $hasTrail ? substr($normalized, 0, -1) : $normalized;
 		$header     = $hasTrail ? '|' : '|-';
 		$pad        = str_repeat(' ', $indent);
 		$lines      = explode("\n", $body);
-		$indented   = array_map(static fn (string $line): string => $line === '' ? '' : $pad . $line, $lines);
 
-		return $header . "\n" . implode("\n", $indented);
+		foreach ($lines as $i => $line) {
+			if ($line !== '') {
+				$lines[$i] = $pad . $line;
+			}
+		}
+
+		return $header . "\n" . implode("\n", $lines);
 	}
 
 	/**
@@ -254,23 +281,39 @@ final class YamlEmitter {
 	 * @return bool True when quoting is necessary for round-trip safety.
 	 */
 	private static function needsQuoting(string $value): bool {
-		if ($value === '' || trim($value) !== $value) {
+		$len = strlen($value);
+
+		if ($len === 0) {
 			return true;
 		}
 
-		if (in_array(strtolower($value), self::RESERVED_SCALARS, true)) {
+		$first = $value[0];
+		$last  = $value[$len - 1];
+
+		if ($first <= ' ' || $last <= ' ') {
 			return true;
 		}
 
-		if (preg_match('/^[+-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0o[0-7]+|(?:[0-9]+\.[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)$/D', $value) === 1) {
+		if (str_contains(self::SPECIAL_LEADING, $first)) {
 			return true;
 		}
 
-		if (preg_match('/^[-?:,\[\]{}#&*!|>\'"%@`]/', $value) === 1) {
+		if ($len <= 5 && isset(self::RESERVED_SCALAR_MAP[strtolower($value)])) {
 			return true;
 		}
 
-		if (str_contains($value, ': ') || str_ends_with($value, ':') || str_contains($value, ' #')) {
+		if (
+			($first >= '0' && $first <= '9')
+			|| $first === '+'
+			|| $first === '-'
+			|| $first === '.'
+		) {
+			if (preg_match('/^[+-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0o[0-7]+|(?:[0-9]+\.[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)$/D', $value) === 1) {
+				return true;
+			}
+		}
+
+		if ($last === ':' || str_contains($value, ': ') || str_contains($value, ' #')) {
 			return true;
 		}
 

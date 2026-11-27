@@ -117,10 +117,10 @@ final class CrossParameterValidator {
 			}
 		}
 
-		// Collect declared sites, pollers, and templates for referential checks.
-		$declaredSites     = self::extractKnownNames($spec['sites'] ?? [], 'name', $context['knownSites'] ?? []);
-		$declaredPollers   = self::extractKnownNames($spec['pollers'] ?? [], 'name', $context['knownPollers'] ?? ['Main Poller']);
-		$declaredTemplates = self::extractKnownNames($spec['templates'] ?? [], 'name', $context['knownTemplates'] ?? []);
+		// Collect declared sites, pollers, and templates as O(1) hash sets for referential checks.
+		$declaredSites     = self::extractKnownNameSet($spec['sites'] ?? [], 'name', $context['knownSites'] ?? []);
+		$declaredPollers   = self::extractKnownNameSet($spec['pollers'] ?? [], 'name', $context['knownPollers'] ?? ['Main Poller']);
+		$declaredTemplates = self::extractKnownNameSet($spec['templates'] ?? [], 'name', $context['knownTemplates'] ?? []);
 		$declaredHosts     = [];
 
 		// 2. Device SNMPv1/v2/v3 and site/poller/template consistency.
@@ -133,20 +133,20 @@ final class CrossParameterValidator {
 				$prefix = sprintf('spec.devices[%s]', (string) $idx);
 
 				if (is_string($device['hostname'] ?? null) && $device['hostname'] !== '') {
-					$declaredHosts[] = $device['hostname'];
+					$declaredHosts[$device['hostname']] = true;
 				}
 
-				$errors = array_merge($errors, self::validateDeviceSnmp($device, $prefix));
+				self::validateDeviceSnmp($device, $prefix, $errors);
 
-				if (is_string($device['site'] ?? null) && $device['site'] !== '' && $declaredSites !== [] && !in_array($device['site'], $declaredSites, true)) {
+				if (is_string($device['site'] ?? null) && $device['site'] !== '' && $declaredSites !== [] && !isset($declaredSites[$device['site']])) {
 					$errors[] = sprintf('%s.site: references undeclared site "%s".', $prefix, $device['site']);
 				}
 
-				if (is_string($device['poller'] ?? null) && $device['poller'] !== '' && $declaredPollers !== [] && !in_array($device['poller'], $declaredPollers, true)) {
+				if (is_string($device['poller'] ?? null) && $device['poller'] !== '' && $declaredPollers !== [] && !isset($declaredPollers[$device['poller']])) {
 					$errors[] = sprintf('%s.poller: references undeclared poller "%s".', $prefix, $device['poller']);
 				}
 
-				if (is_string($device['template'] ?? null) && $device['template'] !== '' && $declaredTemplates !== [] && !in_array($device['template'], $declaredTemplates, true)) {
+				if (is_string($device['template'] ?? null) && $device['template'] !== '' && $declaredTemplates !== [] && !isset($declaredTemplates[$device['template']])) {
 					$errors[] = sprintf('%s.template: references undeclared template "%s".', $prefix, $device['template']);
 				}
 			}
@@ -191,12 +191,12 @@ final class CrossParameterValidator {
 
 					$packName = is_string($pack['name'] ?? null) ? $pack['name'] : '';
 
-					if ($packName !== '' && in_array($packName, $seenPacks, true)) {
+					if ($packName !== '' && isset($seenPacks[$packName])) {
 						$errors[] = sprintf('spec.plugins.yaml.packs[%s]: duplicate pack name "%s".', (string) $pIdx, $packName);
 					}
 
 					if ($packName !== '') {
-						$seenPacks[] = $packName;
+						$seenPacks[$packName] = true;
 					}
 
 					if (isset($pack['lockSha256']) && is_string($pack['lockSha256']) && $pack['lockSha256'] !== '') {
@@ -216,13 +216,12 @@ final class CrossParameterValidator {
 	 *
 	 * @param array<int|string, mixed> $device Device mapping.
 	 * @param string $prefix Diagnostic field path prefix.
-	 * @return list<string> Validation errors.
+	 * @param list<string> $errors Validation error accumulator.
+	 * @return void
 	 */
-	private static function validateDeviceSnmp(array $device, string $prefix): array {
-		$errors = [];
-
+	private static function validateDeviceSnmp(array $device, string $prefix, array &$errors): void {
 		if (!array_key_exists('snmpVersion', $device) && !array_key_exists('snmp', $device)) {
-			return [];
+			return;
 		}
 
 		$snmp = is_array($device['snmp'] ?? null) ? $device['snmp'] : $device;
@@ -230,11 +229,13 @@ final class CrossParameterValidator {
 		$rawVersion = $snmp['version'] ?? $snmp['snmpVersion'] ?? null;
 
 		if ($rawVersion === null) {
-			return [];
+			return;
 		}
 
 		if (!is_int($rawVersion) || !in_array($rawVersion, self::SNMP_VERSIONS, true)) {
-			return [sprintf('%s: snmpVersion must be one of 0, 1, 2, or 3.', $prefix)];
+			$errors[] = sprintf('%s: snmpVersion must be one of 0, 1, 2, or 3.', $prefix);
+
+			return;
 		}
 
 		$community = is_string($snmp['community'] ?? null) ? trim($snmp['community']) : '';
@@ -253,7 +254,7 @@ final class CrossParameterValidator {
 				$errors[] = sprintf('%s: SNMP v%d must not combine SNMPv3 credentials (username/authPassword/privPassphrase).', $prefix, $rawVersion);
 			}
 
-			return $errors;
+			return;
 		}
 
 		if ($rawVersion === 3) {
@@ -296,8 +297,6 @@ final class CrossParameterValidator {
 				$errors[] = sprintf('%s: SNMPv3 must not declare a v1/v2 community string.', $prefix);
 			}
 		}
-
-		return $errors;
 	}
 
 	/**
@@ -305,8 +304,8 @@ final class CrossParameterValidator {
 	 *
 	 * @param array<int|string, mixed> $items Tree items array.
 	 * @param string $prefix Path prefix.
-	 * @param list<string> $knownSites Declared/known site names.
-	 * @param list<string> $knownHosts Declared device hostnames.
+	 * @param array<string, true> $knownSites Declared/known site name set.
+	 * @param array<string, true> $knownHosts Declared device hostname set.
 	 * @param list<string> $errors Error accumulator.
 	 * @return void
 	 */
@@ -324,11 +323,11 @@ final class CrossParameterValidator {
 
 			$itemPath = $prefix . '[' . (string) $idx . ']';
 
-			if (is_string($item['site'] ?? null) && $item['site'] !== '' && $knownSites !== [] && !in_array($item['site'], $knownSites, true)) {
+			if (is_string($item['site'] ?? null) && $item['site'] !== '' && $knownSites !== [] && !isset($knownSites[$item['site']])) {
 				$errors[] = sprintf('%s.site: references undeclared site "%s".', $itemPath, $item['site']);
 			}
 
-			if (is_string($item['device'] ?? null) && $item['device'] !== '' && $knownHosts !== [] && !in_array($item['device'], $knownHosts, true)) {
+			if (is_string($item['device'] ?? null) && $item['device'] !== '' && $knownHosts !== [] && !isset($knownHosts[$item['device']])) {
 				$errors[] = sprintf('%s.device: references undeclared device "%s".', $itemPath, $item['device']);
 			}
 
@@ -357,12 +356,12 @@ final class CrossParameterValidator {
 				continue;
 			}
 
-			$name        = (string) $fieldKey;
-			$allFields[] = $name;
-			$direction   = is_string($fieldDef['direction'] ?? null) ? $fieldDef['direction'] : '';
+			$name             = (string) $fieldKey;
+			$allFields[$name] = true;
+			$direction        = is_string($fieldDef['direction'] ?? null) ? $fieldDef['direction'] : '';
 
 			if ($direction === 'input' || $direction === 'input-output') {
-				$inputFields[] = $name;
+				$inputFields[$name] = true;
 			}
 
 			if ($kind === 'SnmpDataQuery' && isset($fieldDef['queryName'])) {
@@ -384,9 +383,9 @@ final class CrossParameterValidator {
 					continue;
 				}
 
-				if (!in_array($orderField, $allFields, true)) {
+				if (!isset($allFields[$orderField])) {
 					$errors[] = sprintf('spec.indexOrder: references undefined field "%s".', $orderField);
-				} elseif (!in_array($orderField, $inputFields, true)) {
+				} elseif (!isset($inputFields[$orderField])) {
 					$errors[] = sprintf('spec.indexOrder: field "%s" must have direction "input" or "input-output" (not output-only).', $orderField);
 				}
 			}
@@ -430,7 +429,7 @@ final class CrossParameterValidator {
 		foreach ($usedRefs as $refString) {
 			$target = substr($refString, 4);
 
-			if (!in_array($target, $definedRefs, true) && !str_starts_with($target, 'system/')) {
+			if (!isset($definedRefs[$target]) && !str_starts_with($target, 'system/')) {
 				$errors[] = sprintf('spec.objects: dangling symbolic reference "ref:%s" not defined in bundle.', $target);
 			}
 		}
@@ -440,20 +439,20 @@ final class CrossParameterValidator {
 
 	/**
 	 * Recursively collect all defined `ref` identifiers from top-level and nested
-	 * template objects while detecting duplicates.
+	 * template objects while detecting duplicates in O(1) per object.
 	 *
 	 * @param array<int|string, mixed> $node Template object or nested field container.
-	 * @param list<string> $definedRefs Accumulated defined refs.
+	 * @param array<string, true> $definedRefs Accumulated defined ref hash set.
 	 * @param list<string> $errors Duplicate error accumulator.
 	 * @return void
 	 */
 	private static function collectDefinedRefs(array $node, array &$definedRefs, array &$errors): void {
 		if (isset($node['ref'], $node['type']) && is_string($node['ref']) && $node['ref'] !== '') {
-			if (in_array($node['ref'], $definedRefs, true)) {
+			if (isset($definedRefs[$node['ref']])) {
 				$errors[] = sprintf('spec.objects: duplicate symbolic ref "%s".', $node['ref']);
 			}
 
-			$definedRefs[] = $node['ref'];
+			$definedRefs[$node['ref']] = true;
 		}
 
 		foreach ($node as $key => $value) {
@@ -519,20 +518,20 @@ final class CrossParameterValidator {
 	}
 
 	/**
-	 * Combine declared resource names from a spec list with optional live catalog names.
+	 * Combine declared resource names from a spec list with optional live catalog names into an O(1) hash set.
 	 *
 	 * @param mixed $list Spec resource list.
 	 * @param string $field Field name containing the natural identifier.
 	 * @param mixed $extra Optional list of pre-existing catalog names.
-	 * @return list<string> Unique known names.
+	 * @return array<string, true> Hash set of known names.
 	 */
-	private static function extractKnownNames(mixed $list, string $field, mixed $extra): array {
+	private static function extractKnownNameSet(mixed $list, string $field, mixed $extra): array {
 		$names = [];
 
 		if (is_array($extra)) {
 			foreach ($extra as $item) {
 				if (is_string($item) && $item !== '') {
-					$names[] = $item;
+					$names[$item] = true;
 				}
 			}
 		}
@@ -540,11 +539,11 @@ final class CrossParameterValidator {
 		if (is_array($list)) {
 			foreach ($list as $entry) {
 				if (is_array($entry) && is_string($entry[$field] ?? null) && $entry[$field] !== '') {
-					$names[] = $entry[$field];
+					$names[$entry[$field]] = true;
 				}
 			}
 		}
 
-		return array_values(array_unique($names));
+		return $names;
 	}
 }

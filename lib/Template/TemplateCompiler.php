@@ -32,6 +32,11 @@ use Somethingwithproof\Yaml\Validation\CrossParameterValidator;
  */
 final class TemplateCompiler {
 	/**
+	 * Characters valid after the leading character of a Cacti XML element name.
+	 */
+	private const XML_NAME_TAIL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-';
+
+	/**
 	 * Compile a YAML string representing a CactiTemplateBundle into canonical
 	 * Cacti `<cacti>` XML plus its deterministic SHA-256 digest.
 	 *
@@ -253,7 +258,13 @@ final class TemplateCompiler {
 				continue;
 			}
 
-			if (preg_match('/^[A-Za-z_][A-Za-z0-9_.-]*$/D', $name) !== 1) {
+			$nameLen = strlen($name);
+
+			if (
+				$nameLen === 0
+				|| !(($name[0] >= 'a' && $name[0] <= 'z') || ($name[0] >= 'A' && $name[0] <= 'Z') || $name[0] === '_')
+				|| strspn($name, self::XML_NAME_TAIL_CHARS, 1) !== $nameLen - 1
+			) {
 				throw new YamlException(sprintf('Invalid XML element name "%s" in template fields.', $name));
 			}
 
