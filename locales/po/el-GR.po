@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Greek <https://translate.cacti.net/projects/cacti/core/el/>\n"
+"Language: el-GR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Προβολή YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Χειριστής YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Διαχειριστής YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Σχήμα και αναφορά YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Επικύρωση και μεταγλώττιση YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Επαναφόρτωση YAML και πακέτα"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Πρότυπα YAML, σχήμα και τμήματα CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Πηγές τμημάτων YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Λίστα αρχείων YAML ή καταλόγων casc.d διαχωρισμένων με κόμμα που συγχωνεύονται με ντετερμινιστική λεξικογραφική σειρά."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Πολιτική συγχώνευσης τμημάτων"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Η αυστηρή λειτουργία απορρίπτει αντικρουόμενα βαθμωτά κλειδιά μεταξύ τμημάτων· η επικάλυψη επιτρέπει στα μεταγενέστερα τμήματα να υπερισχύουν των προηγούμενων τιμών."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Αυστηρή (αποτυχία σε βαθμωτές συγκρούσεις)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Επικάλυψη (τα μεταγενέστερα τμήματα υπερισχύουν)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Κατάλογος πακέτων παρακολούθησης"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Βασικός κατάλογος που περιέχει εκδοσιοποιημένα πακέτα παρακολούθησης YAML και αρχεία κλειδώματος."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Διατήρηση πινάκων προσθέτου κατά την απεγκατάσταση"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Διατήρηση των πινάκων plugin_yaml_packs, plugin_yaml_queries και plugin_yaml_audit κατά την απεγκατάσταση του προσθέτου."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Το πρόσθετο YAML απαιτεί PHP %s ή νεότερη έκδοση. Αυτός ο διακομιστής εκτελεί PHP %s, επομένως το πρόσθετο δεν εγκαταστάθηκε ούτε ενεργοποιήθηκε."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Εισαγωγή/Εξαγωγή"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Το πρόσθετο YAML δεν είναι ενεργοποιημένο."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Το πρόσθετο YAML απαιτεί PHP %s ή νεότερη έκδοση."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Η επικύρωση του διακριτικού CSRF απέτυχε. Επαναφορτώστε τη σελίδα και δοκιμάστε ξανά."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Διαμορφώστε το yaml_source_paths στις ρυθμίσεις του Cacti πριν εκτελέσετε επαναφόρτωση."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Δεν βρέθηκε αντίστοιχο εκκρεμές σχέδιο επαναφόρτωσης στη συνεδρία σας. Υπολογίστε πρώτα ένα νέο σχέδιο."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Επαναφόρτωση YAML και πακέτα παρακολούθησης (Διαχειριστής)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Υπολογισμός σχεδίου επαναφόρτωσης από διαμορφωμένες πηγές"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Παρέχετε ένα έγγραφο YAML για επικύρωση ή μεταγλώττιση."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "Το %s μεταγλωττίστηκε με επιτυχία."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Η σύνταξη YAML, τα σύμβολα κράτησης θέσης και οι διαπαραμετρικές αναλλοίωτες πέρασαν τον έλεγχο."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Επικύρωση, μεταγλώττιση και δοκιμαστική προεπισκόπηση YAML (Χειριστής)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Πρότυπο YAML, ερώτημα δεδομένων ή τμήμα CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Επικύρωση και απόκρυψη ευαίσθητων στοιχείων"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Μεταγλώττιση σε Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Σχήμα YAML, αναφορά και κατάσταση με απόκρυψη ευαίσθητων στοιχείων"

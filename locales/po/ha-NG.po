@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Hausa <developers@cacti.net>\n"
+"Language: ha_NG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Duba YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Mai sarrafa YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Mai kula da YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Tsarin YAML da madogara"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Tabbatarwa da haɗa YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Sake lodawa da fakitin YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Samfuran YAML, tsari da sassan CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Tushen sassan YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Jerin fayilolin YAML ko kundayen adireshi na casc.d da aka raba da waƙafi kuma aka haɗe su bisa tsayayyen jerin haruffa."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Manufar haɗa sassa"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Tsayayye yana ƙin maɓallan scalar masu karo tsakanin sassa; rufe yana barin sassan baya su maye gurbin ƙimomin farko."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Tsayayye (gaza kan karowar scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Rufe (sassan baya suna maye gurbi)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Kundin fakitin sa ido"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Babban kundin adireshi mai ɗauke da fakitin sa ido na YAML masu sigogi da fayilolin kullewa."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Ajiye teburorin ƙarin manhaja idan an cire"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Kiyaye teburorin plugin_yaml_packs, plugin_yaml_queries, da plugin_yaml_audit lokacin cire ƙarin manhajar."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Ƙarin manhajar YAML yana buƙatar PHP %s ko sabo. Wannan uwar garken tana amfani da PHP %s, don haka ba a girka ko kunna ƙarin manhajar ba."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Shigo da/Fitar da"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Ba a kunna ƙarin manhajar YAML ba."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Ƙarin manhajar YAML yana buƙatar PHP %s ko sabo."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Tabbatar da alamar CSRF ya gaza. Sake loda shafin kuma sake gwadawa."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Saita yaml_source_paths a cikin Saitunan Cacti kafin gudanar da sake lodawa."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Ba a sami wani shirin sake lodawa mai jiran gado da ya dace a cikin zaman naka ba. Lissafa sabon shiri da farko."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Sake lodawa da fakitin sa ido na YAML (Mai kula)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Lissafa shirin sake lodawa daga tushen da aka saita"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Samar da takardar YAML don tabbatarwa ko haɗawa."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "An haɗa %s cikin nasara."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Tsarin rubutun YAML, masu riƙe wuri, da ƙa'idodin ma'auni tsakanin sigogi sun wuce gwaji."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Tabbatarwa, haɗawa da samfurin gwaji na YAML (Mai sarrafawa)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Samfurin YAML, tambayar bayanai, ko sashen CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Tabbatar kuma ɓoye sirri"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Haɗa zuwa Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Tsarin YAML, madogara da yanayin da aka ɓoye sirri"

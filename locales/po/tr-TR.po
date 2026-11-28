@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Turkish <https://translate.cacti.net/projects/cacti/core/tr/>\n"
+"Language: tr-TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML Görünümü"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML Operatörü"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML Yöneticisi"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "YAML Şeması ve Başvuru"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML Doğrula ve Derle"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML Yeniden Yükleme ve Paketler"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "YAML Şablonları, Şema ve CasC Parçaları"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "YAML Parça Kaynakları (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Belirlenimci sözlüksel sırayla birleştirilen YAML dosyalarının veya casc.d dizinlerinin virgülle ayrılmış listesi."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Parça Birleştirme Politikası"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Katı mod parçalar arasında çakışan skaler anahtarları reddeder; katmanlama sonraki parçaların önceki değerleri geçersiz kılmasına izin verir."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Katı (skaler çakışmalarda hata ver)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Katmanlama (sonraki parçalar geçersiz kılar)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "İzleme Paketleri Dizini"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Sürümlenmiş YAML İzleme Paketlerini ve kilit dosyalarını içeren temel dizin."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Kaldırırken Eklenti Tablolarını Koru"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Eklenti kaldırılırken plugin_yaml_packs, plugin_yaml_queries ve plugin_yaml_audit tablolarını koru."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "YAML eklentisi PHP %s veya daha yeni bir sürüm gerektirir. Bu sunucuda PHP %s çalışıyor, bu nedenle eklenti kurulmadı veya etkinleştirilmedi."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "İçe/Dışa Aktar"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "YAML eklentisi etkin değil."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "YAML eklentisi PHP %s veya daha yeni bir sürüm gerektirir."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "CSRF belirteci doğrulaması başarısız oldu. Sayfayı yenileyin ve tekrar deneyin."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Yeniden yüklemeyi çalıştırmadan önce Cacti Ayarlarında yaml_source_paths değerini yapılandırın."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Oturumunuzda eşleşen bekleyen bir yeniden yükleme planı bulunamadı. Önce yeni bir plan hesaplayın."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML Yeniden Yükleme ve İzleme Paketleri (Yönetici)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Yapılandırılmış Kaynaklardan Yeniden Yükleme Planı Hesapla"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Doğrulamak veya derlemek için bir YAML belgesi sağlayın."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s başarıyla derlendi."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "YAML sözdizimi, yer tutucular ve parametreler arası değişmezler doğrulandı."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML Doğrulama, Derleme ve Deneme Önizlemesi (Operatör)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "YAML Şablonu, Veri Sorgusu veya CasC Parçası:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Doğrula ve Maskele"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Cacti XML Olarak Derle"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "YAML Şeması, Başvuru ve Maskelenmiş Durum"

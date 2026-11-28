@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Hindi <https://translate.cacti.net/projects/cacti/core/hi/>\n"
+"Language: hi-IN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML दृश्य"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML ऑपरेटर"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML व्यवस्थापक"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "YAML स्कीमा और संदर्भ"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML सत्यापन और संकलन"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML पुनः लोड और पैक्स"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "YAML टेम्पलेट्स, स्कीमा और CasC खंड"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "YAML खंड स्रोत (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "अल्पविराम से पृथक YAML फ़ाइलों या casc.d निर्देशिकाओं की सूची जो नियतात्मक शाब्दिक क्रम में मर्ज की जाती है।"
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "खंड मर्ज नीति"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "सख्त नीति खंडों में परस्पर विरोधी स्केलर कुंजियों को अस्वीकार करती है; ओवरले बाद के खंडों को पहले के मानों को अधिलिखित करने की अनुमति देता है।"
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "सख्त (स्केलर टकराव पर विफल)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "ओवरले (बाद के खंड अधिलिखित करते हैं)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "निगरानी पैक्स निर्देशिका"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "संस्करणित YAML निगरानी पैक्स और लॉकफ़ाइलों वाली आधार निर्देशिका।"
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "अनइंस्टॉल पर प्लगइन तालिकाएँ सुरक्षित रखें"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "प्लगइन अनइंस्टॉल करते समय plugin_yaml_packs, plugin_yaml_queries, और plugin_yaml_audit तालिकाओं को सुरक्षित रखें।"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "YAML प्लगइन के लिए PHP %s या उसके बाद का संस्करण आवश्यक है। यह सर्वर PHP %s चला रहा है, इसलिए प्लगइन इंस्टॉल या सक्षम नहीं किया गया।"
+
+#: setup.php
+msgid "Import/Export"
+msgstr "आयात/निर्यात"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "YAML प्लगइन सक्षम नहीं है।"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "YAML प्लगइन के लिए PHP %s या उसके बाद का संस्करण आवश्यक है।"
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "CSRF टोकन सत्यापन विफल रहा। पृष्ठ को पुनः लोड करें और फिर से प्रयास करें।"
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "पुनः लोड चलाने से पहले Cacti सेटिंग्स में yaml_source_paths कॉन्फ़िगर करें।"
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "आपके सत्र में कोई मेल खाती लंबित पुनः लोड योजना नहीं मिली। पहले एक नई योजना की गणना करें।"
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML पुनः लोड और निगरानी पैक्स (व्यवस्थापक)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "कॉन्फ़िगर किए गए स्रोतों से पुनः लोड योजना की गणना करें"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "सत्यापित या संकलित करने के लिए एक YAML दस्तावेज़ प्रदान करें।"
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s सफलतापूर्वक संकलित हुआ।"
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "YAML वाक्यविन्यास, प्लेसहोल्डर और क्रॉस-पैरामीटर निश्चर सत्यापित हुए।"
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML सत्यापन, संकलन और ड्राई-रन पूर्वावलोकन (ऑपरेटर)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "YAML टेम्पलेट, डेटा क्वेरी, या CasC खंड:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "सत्यापित करें और संपादित करें"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Cacti XML में संकलित करें"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "YAML स्कीमा, संदर्भ और संपादित स्थिति"

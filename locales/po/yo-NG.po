@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Yoruba <developers@cacti.net>\n"
+"Language: yo_NG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Ìwò YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Olùṣiṣẹ́ YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Alábòójútó YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Ìlànà àti Ìtọ́kasí YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Ṣàyẹ̀wò àti Kójọ YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Tún Gbé Sókè àti Àwọn Àpò YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Àwọn Àwòkọ́ṣe YAML, Ìlànà àti Àwọn Ẹ̀yà CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Àwọn Orísun Ẹ̀yà YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Àkójọ àwọn fáìlì YAML tàbí àwọn ìtọ́kasí casc.d tí a fi kọ́mà pín tí a dàpọ̀ ní ìtẹ̀léra álífábẹ́ẹ̀tì tí kò yípadà."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Ìlànà Ìdàpọ̀ Ẹ̀yà"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Líle kọ àwọn kọ́kọ́rọ́ scalar tí ó tako ara wọn láàárín àwọn ẹ̀yà; ìbòjú jẹ́ kí àwọn ẹ̀yà tó tẹ̀lé rọ́pò àwọn iye ìṣáájú."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Líle (kùnà nígbà ìtakora scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Ìbòjú (àwọn ẹ̀yà tó tẹ̀lé ń rọ́pò)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Ìtọ́kasí Àwọn Àpò Ìṣọ́"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Ìtọ́kasí ìpìlẹ̀ tí ó ní Àwọn Àpò Ìṣọ́ YAML oní-ẹ̀yà àti àwọn fáìlì ìtìpa."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Pa Àwọn Tábìlì Àfikún Mọ́ Nígbà Ìyọkúrò"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Pa àwọn tábìlì plugin_yaml_packs, plugin_yaml_queries, àti plugin_yaml_audit mọ́ nígbà tí o bá ń yọ àfikún náà kúrò."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Àfikún YAML nílò PHP %s tàbí ẹ̀yà tuntun jù bẹ́ẹ̀ lọ. Olùpèsè yìí ń lo PHP %s, nítorí náà a kò fi àfikún náà sórí ẹ̀rọ tàbí mú un ṣiṣẹ́."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Gbé Wọlé/Gbé Jáde"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "A kò mú àfikún YAML ṣiṣẹ́."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Àfikún YAML nílò PHP %s tàbí ẹ̀yà tuntun jù bẹ́ẹ̀ lọ."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Ìjẹ́rìísí àmì CSRF kùnà. Tún ojú-ìwé náà gbé sókè kí o sì gbìyànjú lẹ́ẹ̀kan sí i."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Ṣètò yaml_source_paths nínú Ètò Cacti kí o tó ṣiṣẹ́ àtúngbésókè."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "A kò rí ètò àtúngbésókè tí ó ń dúró de tí ó báamu nínú ìgbà iṣẹ́ rẹ. Kọ́kọ́ ṣírò ètò tuntun."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Àtúngbésókè YAML àti Àwọn Àpò Ìṣọ́ (Alábòójútó)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Ṣírò Ètò Àtúngbésókè láti Àwọn Orísun Tí A Ṣètò"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Pèsè ìwé YAML kan láti ṣàyẹ̀wò tàbí kójọ."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "A ti kójọ %s ní àṣeyọrí."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Ìlànà ìkọ̀wé YAML, àwọn olùdìmú-ààyè, àti àwọn òfin àìyípadà láàárín àwọn ìlànà ti kọjá àyẹ̀wò."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Ìṣàyẹ̀wò, Ìkójọ àti Àwòkọ́kọ́ Àyẹ̀wò YAML (Olùṣiṣẹ́)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Àwòkọ́ṣe YAML, Ìbéèrè Data, tàbí Ẹ̀yà CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Ṣàyẹ̀wò àti Bo Àṣírí"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Kójọ sí Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Ìlànà YAML, Ìtọ́kasí àti Ipò Tí A Bo Àṣírí"

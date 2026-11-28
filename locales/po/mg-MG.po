@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Malagasy <developers@cacti.net>\n"
+"Language: mg_MG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Fijerena YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Mpampiasa YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Mpitantana YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Drafitra sy boky torolalana YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Fanamarinana sy fanambarana YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Famerenana mamaky sy fonosana YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Modely YAML, drafitra ary ampahan'ny CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Loharanon'ny ampahan'ny YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Lisitra misaraka amin'ny faingo misy rakitra YAML na lahatahiry casc.d atambatra araka ny filaharan'ny abidia voafaritra tsara."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Politika fanambarana ampahany"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Ny hentitra dia mandà ny fanalahidy scalar mifanohitra amin'ny ampahany samihafa; ny fanindriana dia mamela ny ampahany taty aoriana hanolo ny sanda teo aloha."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Hentitra (tsy mahomby raha misy fifanoherana scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Fanindriana (ny ampahany taty aoriana no manolo)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Lahatahirin'ny fonosana fanaraha-maso"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Lahatahiry fototra ahitana fonosana fanaraha-maso YAML misy kinova sy rakitra fanidiana."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Tehirizo ny tabilao fanampin-drindranasa rehefa manaisotra"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Tehirizo ny tabilao plugin_yaml_packs, plugin_yaml_queries ary plugin_yaml_audit rehefa manaisotra ny fanampin-drindranasa."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Mila PHP %s na vaovao kokoa ny fanampin-drindranasa YAML. Mampiasa PHP %s ity mpizara ity, ka tsy napetraka na navela hiasa ilay fanampin-drindranasa."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Fanafarana/Fanondranana"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Tsy navela hiasa ny fanampin-drindranasa YAML."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Mila PHP %s na vaovao kokoa ny fanampin-drindranasa YAML."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Tsy nahomby ny fanamarinana ny marika CSRF. Havaozy ny pejy ary andramo indray."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Amboary ny yaml_source_paths ao amin'ny firafitry ny Cacti alohan'ny hamerenana mamaky."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Tsy nahitana drafitra famerenana mamaky miandry mifanaraka amin'ny fivoriana misy anao. Kajio aloha ny drafitra vaovao."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Famerenana mamaky YAML sy fonosana fanaraha-maso (Mpitantana)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Kajio ny drafitra famerenana mamaky avy amin'ny loharano voalamina"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Manomeza antontan-taratasy YAML hoamarinina na hatambatra."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "Tafakambana soa aman-tsara ny %s."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Nandalo soa aman-tsara ny fitsipi-panoratana YAML, ny toerana famenoana ary ny fitsipika tsy miova eo amin'ny masontsivana."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Fanamarinana, fanambarana ary topi-maso andrana YAML (Mpampiasa)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Modely YAML, fangatahana angon-drakitra na ampahan'ny CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Hamarino ary afeno ny tsiambaratelo"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Atambaro ho Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Drafitra YAML, boky torolalana ary toe-javatra nanafenana tsiambaratelo"

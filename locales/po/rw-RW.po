@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Kinyarwanda <developers@cacti.net>\n"
+"Language: rw_RW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Reba YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Umukoresha wa YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Umuyobozi wa YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Imiterere n'inyandiko yifashishwa ya YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Genzura kandi utunganye YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Ongera upakurure YAML n'amapaki"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Inyandikorugero za YAML, imiterere n'ibice bya CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Aho ibice bya YAML bituruka (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Urutonde rutandukanyijwe n'akitso rw'amadosiye ya YAML cyangwa ububiko bwa casc.d bihuzwa mu buryo bw'inyuguti buhamye."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Politiki yo guhuza ibice"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Uburyo bukaze buhakana imfunguzo za scalar zivuguruzanya mu bice; ugerekeranya wemerera ibice bishya gusimbura agaciro ka mbere."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Bukaze (guhagarara habaye ukuvuguruzanya kwa scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Gerekeranya (ibice bishya birasimbura)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Ububiko bw'amapaki y'ubugenzuzi"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Ububiko bw'ibanze burimo amapaki y'ubugenzuzi ya YAML afite verisiyo n'amadosiye yo gufunga."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Guma ubika imbonerahamwe z'umugereka mu gihe cyo gukuramo"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Kubungabunga imbonerahamwe za plugin_yaml_packs, plugin_yaml_queries, na plugin_yaml_audit mu gihe ukuramo umugereka."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Umugereka wa YAML usaba PHP %s cyangwa isumbuyeho. Iyi seriveri ikoresha PHP %s, bityo umugereka ntiwashyizwemo cyangwa ngo wemerwe."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Kwinjiza/Gusohora"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Umugereka wa YAML ntiwemewe."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Umugereka wa YAML usaba PHP %s cyangwa isumbuyeho."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Igenzura ry'ikimenyetso cya CSRF ryanze. Ongera utangize paji wongere ugerageze."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Tegura yaml_source_paths mu igenamiterere rya Cacti mbere yo kongera gupakurura."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Nta gahunda yo kongera gupakurura itegereje ihuye yabonetse mu gihe cy'ikoresha ryawe. Banza ubare gahunda nshya."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Kongera gupakurura YAML n'amapaki y'ubugenzuzi (Umuyobozi)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Bara gahunda yo kongera gupakurura uhereye ku masoko yateguwe"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Tanga inyandiko ya YAML yo kugenzura cyangwa gutunganya."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s yatunganyijwe neza."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Imyandikire ya YAML, ibisimbura n'amategeko ahuriweho n'ibipimo byagenzuwe neza."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Kugenzura, gutunganya no kureba igerageza rya YAML (Umukoresha)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Inyandikorugero ya YAML, ishakisha ry'amakuru, cyangwa igice cya CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Genzura kandi uhishe amabanga"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Tunganya muri Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Imiterere ya YAML, inyandiko yifashishwa n'imiterere yahishwe amabanga"

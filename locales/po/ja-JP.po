@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Japanese <https://translate.cacti.net/projects/cacti/core/ja/>\n"
+"Language: ja-JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML 表示"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML オペレーター"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML 管理者"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "YAML スキーマとリファレンス"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML 検証とコンパイル"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML 再読み込みとパック"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "YAML テンプレート、スキーマ、および CasC フラグメント"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "YAML フラグメントソース (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "決定論的な辞書順でマージされる YAML ファイルまたは casc.d ディレクトリのカンマ区切りリスト。"
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "フラグメントマージポリシー"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Strict はフラグメント間で競合するスカラーキーを拒否します。Overlay は後のフラグメントで前の値を上書きできるようにします。"
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Strict（スカラー競合時に失敗）"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Overlay（後のフラグメントで上書き）"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "監視パックディレクトリ"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "バージョン管理された YAML 監視パックとロックファイルを含むベースディレクトリ。"
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "アンインストール時にプラグインテーブルを保持"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "プラグインのアンインストール時に plugin_yaml_packs、plugin_yaml_queries、および plugin_yaml_audit テーブルを保持します。"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "YAML プラグインには PHP %s 以降が必要です。このサーバーでは PHP %s が実行されているため、プラグインはインストールまたは有効化されませんでした。"
+
+#: setup.php
+msgid "Import/Export"
+msgstr "インポート/エクスポート"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "YAML プラグインは有効になっていません。"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "YAML プラグインには PHP %s 以降が必要です。"
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "CSRF トークンの検証に失敗しました。ページを再読み込みして再試行してください。"
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "再読み込みを実行する前に、Cacti 設定で yaml_source_paths を構成してください。"
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "セッション内に一致する保留中の再読み込み計画が見つかりませんでした。最初に新しい計画を計算してください。"
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML 再読み込みと監視パック（管理者）"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "構成済みソースから再読み込み計画を計算"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "検証またはコンパイルする YAML ドキュメントを入力してください。"
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s のコンパイルに成功しました。"
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "YAML 構文、プレースホルダー、およびパラメーター間の不変条件の検証に合格しました。"
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML 検証、コンパイル、およびドライランプレビュー（オペレーター）"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "YAML テンプレート、データクエリ、または CasC フラグメント:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "検証と墨消し"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Cacti XML にコンパイル"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "YAML スキーマ、リファレンス、および墨消し済み状態"
