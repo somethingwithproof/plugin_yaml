@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Swahili <developers@cacti.net>\n"
+"Language: sw_KE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Mwonekano wa YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Mwendeshaji wa YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Msimamizi wa YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Muundo na Marejeleo ya YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Thibitisha na Kusanya YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Pakia Upya na Vifurushi vya YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Violezo vya YAML, Muundo na Vipande vya CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Vyanzo vya Vipande vya YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Orodha iliyotenganishwa kwa koma ya faili za YAML au saraka za casc.d zinazounganishwa kwa mpangilio thabiti wa kialfabeti."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Sera ya Kuunganisha Vipande"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Mkali hukataa funguo za scalar zinazokinzana kati ya vipande; ufunikaji huruhusu vipande vya baadaye kubatilisha thamani za awali."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Mkali (shindwa kwenye migongano ya scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Ufunikaji (vipande vya baadaye hubatilisha)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Saraka ya Vifurushi vya Ufuatiliaji"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Saraka ya msingi yenye Vifurushi vya Ufuatiliaji vya YAML vyenye matoleo na faili za kufuli."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Hifadhi Majedwali ya Programu-jalizi Wakati wa Kuondoa"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Hifadhi majedwali ya plugin_yaml_packs, plugin_yaml_queries, na plugin_yaml_audit wakati wa kuondoa programu-jalizi."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Programu-jalizi ya YAML inahitaji PHP %s au toleo jipya zaidi. Seva hii inatumia PHP %s, kwa hivyo programu-jalizi haikusakinishwa wala kuwezeshwa."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Ingiza/Hamisha"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Programu-jalizi ya YAML haijawezeshwa."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Programu-jalizi ya YAML inahitaji PHP %s au toleo jipya zaidi."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Uthibitishaji wa tokeni ya CSRF umeshindikana. Pakia upya ukurasa kisha ujaribu tena."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Sanidi yaml_source_paths katika Mipangilio ya Cacti kabla ya kuendesha upakiaji upya."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Hakuna mpango unaolingana wa kupakia upya unaosubiri uliopatikana katika kipindi chako. Kokotoa mpango mpya kwanza."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Upakiaji Upya wa YAML na Vifurushi vya Ufuatiliaji (Msimamizi)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Kokotoa Mpango wa Kupakia Upya kutoka Vyanzo Vilivyosanidiwa"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Toa hati ya YAML ili kuthibitisha au kukusanya."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s imekusanywa kwa mafanikio."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Sintaksia ya YAML, vishikilia nafasi, na masharti ya vigezo mtambuka yamefaulu."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Uthibitishaji, Ukusanyaji na Hakiki ya Majaribio ya YAML (Mwendeshaji)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Kiolezo cha YAML, Hoja ya Data, au Kipande cha CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Thibitisha na Ficha Siri"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Kusanya hadi Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Muundo wa YAML, Marejeleo na Hali Iliyofichwa Siri"

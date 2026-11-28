@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Amharic <developers@cacti.net>\n"
+"Language: am_ET\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "የYAML እይታ"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "የYAML ኦፕሬተር"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "የYAML አስተዳዳሪ"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "የYAML ንድፍ እና ማጣቀሻ"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML ማረጋገጥ እና ማጠናቀር"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML ዳግም መጫን እና ጥቅሎች"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "የYAML አብነቶች፣ ንድፍ እና የCasC ቁርጥራጮች"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "የYAML ቁርጥራጭ ምንጮች (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "በተወሰነ ፊደላዊ ቅደም ተከተል የተዋሃዱ በኮማ የተለዩ የYAML ፋይሎች ወይም የcasc.d ማውጫዎች ዝርዝር።"
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "የቁርጥራጭ ውህደት ፖሊሲ"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "ጥብቅ በቁርጥራጮች መካከል የሚጋጩ ስካላር ቁልፎችን ውድቅ ያደርጋል፤ ተደራቢ በኋላ የመጡ ቁርጥራጮች ቀደም ያሉ ዋጋዎችን እንዲተኩ ያስችላል።"
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "ጥብቅ (በስካላር ግጭቶች ላይ ውድቅ አድርግ)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "ተደራቢ (የኋላ ቁርጥራጮች ይተካሉ)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "የክትትል ጥቅሎች ማውጫ"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "በስሪት የተደራጁ የYAML ክትትል ጥቅሎችን እና የመቆለፊያ ፋይሎችን የያዘ መሰረታዊ ማውጫ።"
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "ሲራገፍ የተሰኪ ሠንጠረዦችን አቆይ"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "ተሰኪውን ሲያራግፉ የplugin_yaml_packs፣ plugin_yaml_queries እና plugin_yaml_audit ሠንጠረዦችን ጠብቀው ያቆዩ።"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "የYAML ተሰኪ PHP %s ወይም ከዚያ በላይ ይፈልጋል። ይህ አገልጋይ PHP %s ያሄዳል፣ ስለዚህ ተሰኪው አልተጫነም ወይም አልነቃም።"
+
+#: setup.php
+msgid "Import/Export"
+msgstr "ማስገባት/ማስወጣት"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "የYAML ተሰኪ አልነቃም።"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "የYAML ተሰኪ PHP %s ወይም ከዚያ በላይ ይፈልጋል።"
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "የCSRF ቶከን ማረጋገጫ አልተሳካም። ገጹን እንደገና ይጫኑ እና እንደገና ይሞክሩ።"
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "ዳግም መጫንን ከማሄድዎ በፊት በCacti ቅንብሮች ውስጥ yaml_source_paths ያዋቅሩ።"
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "በክፍለ ጊዜዎ ውስጥ የሚዛመድ በመጠባበቅ ላይ ያለ የዳግም መጫን ዕቅድ አልተገኘም። መጀመሪያ አዲስ ዕቅድ ያስሉ።"
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML ዳግም መጫን እና የክትትል ጥቅሎች (አስተዳዳሪ)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "ከተዋቀሩ ምንጮች የዳግም መጫን ዕቅድ ያስሉ"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "ለማረጋገጥ ወይም ለማጠናቀር የYAML ሰነድ ያቅርቡ።"
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s በተሳካ ሁኔታ ተጠናቅሯል።"
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "የYAML አገባብ፣ ቦታ ያዦች እና የመስቀለኛ-መለኪያ ቋሚዎች አልፈዋል።"
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML ማረጋገጥ፣ ማጠናቀር እና የሙከራ ቅድመ እይታ (ኦፕሬተር)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "የYAML አብነት፣ የውሂብ መጠይቅ ወይም የCasC ቁርጥራጭ:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "አረጋግጥ እና ሚስጥር ደብቅ"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "ወደ Cacti XML አጠናቅር"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "የYAML ንድፍ፣ ማጣቀሻ እና የተደበቀ ሁኔታ"

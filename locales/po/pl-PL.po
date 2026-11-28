@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Polish <https://translate.cacti.net/projects/cacti/core/pl/>\n"
+"Language: pl-PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML – podgląd"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML – operator"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML – administrator"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Schemat i dokumentacja YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Walidacja i kompilacja YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Przeładowanie i pakiety YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Szablony YAML, schemat i fragmenty CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Źródła fragmentów YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Rozdzielona przecinkami lista plików YAML lub katalogów casc.d scalanych w deterministycznej kolejności leksykalnej."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Polityka scalania fragmentów"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Tryb ścisły odrzuca sprzeczne klucze skalarne między fragmentami; tryb nakładki pozwala późniejszym fragmentom nadpisywać wcześniejsze wartości."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Ścisły (błąd przy konfliktach skalarnych)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Nakładka (późniejsze fragmenty nadpisują)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Katalog pakietów monitorowania"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Katalog bazowy zawierający wersjonowane pakiety monitorowania YAML i pliki blokad."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Zachowaj tabele wtyczki podczas odinstalowywania"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Zachowaj tabele plugin_yaml_packs, plugin_yaml_queries oraz plugin_yaml_audit podczas odinstalowywania wtyczki."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Wtyczka YAML wymaga PHP %s lub nowszego. Ten serwer korzysta z PHP %s, więc wtyczka nie została zainstalowana ani włączona."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Import/Eksport"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Wtyczka YAML nie jest włączona."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Wtyczka YAML wymaga PHP %s lub nowszego."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Walidacja tokenu CSRF nie powiodła się. Odśwież stronę i spróbuj ponownie."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Skonfiguruj yaml_source_paths w ustawieniach Cacti przed uruchomieniem przeładowania."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "W Twojej sesji nie znaleziono pasującego oczekującego planu przeładowania. Najpierw oblicz nowy plan."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Przeładowanie YAML i pakiety monitorowania (Administrator)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Oblicz plan przeładowania ze skonfigurowanych źródeł"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Podaj dokument YAML do walidacji lub kompilacji."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "Pomyślnie skompilowano %s."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Składnia YAML, symbole zastępcze i niezmienniki międzyparametrowe przeszły weryfikację."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Walidacja, kompilacja i próbny podgląd YAML (Operator)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Szablon YAML, zapytanie danych lub fragment CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Waliduj i zanonimizuj"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Kompiluj do Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Schemat YAML, dokumentacja i zanonimizowany stan"

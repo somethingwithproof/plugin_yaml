@@ -1,0 +1,93 @@
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Static Drupal-style Config/State schema descriptor for plugin_yaml.
+# Discovered by StaticSchemaLoader without instantiating plugin classes.
+
+plugin: yaml
+schemaVersion: '1.0'
+title: YAML Templates, Schema & CasC Fragments
+description: Declarative YAML fragment sources, merge policy, compiled Data Queries, and Monitoring Packs.
+
+config:
+  sourcePaths:
+    type: array
+    description: Ordered YAML fragment files or casc.d directories merged before validation and reload.
+    items:
+      type: string
+      maxLength: 512
+    default: []
+  mergePolicy:
+    type: string
+    enum:
+      - strict
+      - overlay
+    default: strict
+    description: Scalar conflict handling policy across merged YAML fragments.
+  packDir:
+    type: string
+    maxLength: 512
+    default: ''
+    description: Base directory containing versioned YAML Monitoring Packs.
+  managedQueries:
+    type: array
+    description: Declarative SNMP and Script Data Queries compiled into Cacti resource XML.
+    items:
+      type: object
+      required:
+        - name
+        - outputFile
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        kind:
+          type: string
+          enum:
+            - SnmpDataQuery
+            - ScriptDataQuery
+        outputFile:
+          type: string
+          maxLength: 255
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+  packs:
+    type: array
+    description: Pinned Monitoring Packs tracked by name, version, and SHA-256 lock digest.
+    items:
+      type: object
+      required:
+        - name
+        - version
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        version:
+          type: string
+          maxLength: 32
+        sourcePath:
+          type: string
+          maxLength: 512
+        lockSha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+
+state:
+  installedPacksCount:
+    type: integer
+    readOnly: true
+    description: Number of Monitoring Packs currently recorded in plugin_yaml_packs.
+  managedQueriesCount:
+    type: integer
+    readOnly: true
+    description: Number of compiled Data Query XML files tracked in plugin_yaml_queries.
+  lastReloadStatus:
+    type: string
+    readOnly: true
+    description: Outcome of the most recent reload or pack apply audit entry.
+  lastReloadPlanHash:
+    type: string
+    readOnly: true
+    description: SHA-256 plan hash recorded for the most recent apply action.

@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Vietnamese <https://translate.cacti.net/projects/cacti/core/vi/>\n"
+"Language: vi-VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Xem YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Vận hành YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Quản trị YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Lược đồ & Tài liệu tham khảo YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Kiểm tra & Biên dịch YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Tải lại & Gói YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Mẫu YAML, Lược đồ & Phân đoạn CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Nguồn phân đoạn YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Danh sách tệp YAML hoặc thư mục casc.d phân tách bằng dấu phẩy được hợp nhất theo thứ tự từ điển xác định."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Chính sách hợp nhất phân đoạn"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Nghiêm ngặt từ chối các khóa vô hướng xung đột giữa các phân đoạn; ghi đè cho phép các phân đoạn sau ghi đè giá trị trước đó."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Nghiêm ngặt (lỗi khi xung đột giá trị vô hướng)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Ghi đè (phân đoạn sau ghi đè)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Thư mục gói giám sát"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Thư mục gốc chứa các Gói giám sát YAML có phiên bản và tệp khóa."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Giữ lại bảng tiện ích khi gỡ cài đặt"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Giữ lại các bảng plugin_yaml_packs, plugin_yaml_queries và plugin_yaml_audit khi gỡ cài đặt tiện ích mở rộng."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Tiện ích mở rộng YAML yêu cầu PHP %s trở lên. Máy chủ này đang chạy PHP %s, vì vậy tiện ích mở rộng chưa được cài đặt hoặc bật."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Nhập/Xuất"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "Tiện ích mở rộng YAML chưa được bật."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Tiện ích mở rộng YAML yêu cầu PHP %s trở lên."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Xác thực mã thông báo CSRF thất bại. Hãy tải lại trang và thử lại."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Hãy cấu hình yaml_source_paths trong Cài đặt Cacti trước khi chạy tải lại."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Không tìm thấy kế hoạch tải lại đang chờ phù hợp trong phiên của bạn. Hãy tính toán kế hoạch mới trước."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Tải lại YAML & Gói giám sát (Quản trị viên)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Tính toán kế hoạch tải lại từ các nguồn đã cấu hình"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Cung cấp một tài liệu YAML để kiểm tra hoặc biên dịch."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "Đã biên dịch %s thành công."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Cú pháp YAML, trình giữ chỗ và các bất biến liên tham số đều hợp lệ."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Kiểm tra, biên dịch & xem trước chạy thử YAML (Vận hành viên)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Mẫu YAML, Truy vấn dữ liệu hoặc Phân đoạn CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Kiểm tra & Ẩn thông tin nhạy cảm"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Biên dịch sang Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Lược đồ YAML, Tài liệu tham khảo & Trạng thái đã ẩn thông tin nhạy cảm"

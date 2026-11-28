@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Igbo <developers@cacti.net>\n"
+"Language: ig_NG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "Nlele YAML"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "Onye Ọrụ YAML"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "Onye Nchịkwa YAML"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "Atụmatụ na Ntụaka YAML"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "Nkwenye na Nchịkọta YAML"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "Mbutegharị na Ngwugwu YAML"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "Ụkpụrụ YAML, Atụmatụ na Mpekere CasC"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "Isi Iyi Mpekere YAML (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "Ndepụta kewara site na rikọm nke faịlụ YAML ma ọ bụ ndekọ casc.d ejikọtara n'usoro mkpụrụedemede doro anya."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "Iwu Njikọta Mpekere"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "Usoro siri ike na-ajụ igodo scalar na-emegiderịta onwe ha n'etiti mpekere; mkpuchi na-enye ohere ka mpekere ndị e mechara tinye dochie ụkpụrụ mbụ."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "Siri ike (daa na esemokwu scalar)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "Mkpuchi (mpekere ndị ọhụrụ na-edochi)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "Ndekọ Ngwugwu Nlekọta"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "Ndekọ ntọala nwere Ngwugwu Nlekọta YAML nwere ụdị na faịlụ mkpọchi."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "Debe Tebụl Plọgin Mgbe A Na-ewepụ"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "Chekwaa tebụl plugin_yaml_packs, plugin_yaml_queries, na plugin_yaml_audit mgbe a na-ewepụ plọgin ahụ."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "Plọgin YAML chọrọ PHP %s ma ọ bụ karịa. Sava a na-agba PHP %s, yabụ etinyeghị ma ọ bụ rụọ ọrụ plọgin ahụ."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "Mbubata/Mbupụ"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "E meghị ka plọgin YAML rụọ ọrụ."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "Plọgin YAML chọrọ PHP %s ma ọ bụ karịa."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "Nkwenye akara CSRF dara. Butegharịa ibe a wee nwaa ọzọ."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "Hazie yaml_source_paths na Ntọala Cacti tupu ịgbaa mbutegharị."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "Ahụghị atụmatụ mbutegharị na-echere nke dabara na nnọkọ gị. Gbakọọ atụmatụ ọhụrụ mbụ."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "Mbutegharị YAML na Ngwugwu Nlekọta (Onye Nchịkwa)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "Gbakọọ Atụmatụ Mbutegharị site na Isi Iyi E Haziri"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "Nye akwụkwọ YAML iji kwado ma ọ bụ chịkọta."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "Echịkọtara %s nke ọma."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "Usoro okwu YAML, ebe nchekwa na iwu ndị na-adịghị agbanwe n'etiti parampeta gafere."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "Nkwenye YAML, Nchịkọta na Nlele Nnwale (Onye Ọrụ)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "Ụkpụrụ YAML, Ajụjụ Data, ma ọ bụ Mpekere CasC:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "Kwado ma Zobe Nzuzo"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "Chịkọta gaa na Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "Atụmatụ YAML, Ntụaka na Ọnọdụ Ezobere Nzuzo"

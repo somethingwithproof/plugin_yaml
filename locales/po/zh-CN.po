@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Chinese (Simplified Han script) <https://translate.cacti.net/projects/cacti/core/zh_Hans/>\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML 查看"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML 操作员"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML 管理员"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "YAML 架构与参考"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML 校验与编译"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML 重载与监控包"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "YAML 模板、架构与 CasC 片段"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "YAML 片段源 (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "以逗号分隔的 YAML 文件或 casc.d 目录列表，按确定的字典顺序合并。"
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "片段合并策略"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "严格模式拒绝片段间冲突的标量键；覆盖模式允许后续片段覆盖先前的值。"
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "严格模式（标量冲突时失败）"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "覆盖模式（后续片段覆盖先前值）"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "监控包目录"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "包含版本化 YAML 监控包及锁定文件的基础目录。"
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "卸载时保留插件数据表"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "卸载插件时保留 plugin_yaml_packs、plugin_yaml_queries 和 plugin_yaml_audit 数据表。"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "YAML 插件需要 PHP %s 或更高版本。此服务器运行的是 PHP %s，因此未安装或启用该插件。"
+
+#: setup.php
+msgid "Import/Export"
+msgstr "导入/导出"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "YAML 插件未启用。"
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "YAML 插件需要 PHP %s 或更高版本。"
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "CSRF 令牌验证失败。请重新加载页面并重试。"
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "运行重载前，请先在 Cacti 设置中配置 yaml_source_paths。"
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "在您的会话中未找到匹配的待执行重载计划。请先计算一个新计划。"
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML 重载与监控包（管理员）"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "根据已配置源计算重载计划"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "请提供要校验或编译的 YAML 文档。"
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "已成功编译 %s。"
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "YAML 语法、占位符和跨参数不变量均通过校验。"
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML 校验、编译与试运行预览（操作员）"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "YAML 模板、数据查询或 CasC 片段:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "校验并脱敏"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "编译为 Cacti XML"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "YAML 架构、参考与脱敏状态"

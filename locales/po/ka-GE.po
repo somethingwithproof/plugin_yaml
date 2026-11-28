@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: yaml 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_yaml/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Georgian <https://translate.cacti.net/projects/cacti/core/ka/>\n"
+"Language: ka-GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: lib/Pages.php
+msgid "YAML View"
+msgstr "YAML ნახვა"
+
+#: lib/Pages.php
+msgid "YAML Operator"
+msgstr "YAML ოპერატორი"
+
+#: lib/Pages.php
+msgid "YAML Admin"
+msgstr "YAML ადმინისტრატორი"
+
+#: lib/Pages.php
+msgid "YAML Schema & Reference"
+msgstr "YAML სქემა და ცნობარი"
+
+#: lib/Pages.php
+msgid "YAML Validate & Compile"
+msgstr "YAML ვალიდაცია და კომპილაცია"
+
+#: lib/Pages.php
+msgid "YAML Reload & Packs"
+msgstr "YAML გადატვირთვა და პაკეტები"
+
+#: lib/Settings.php setup.php
+msgid "YAML Templates, Schema & CasC Fragments"
+msgstr "YAML შაბლონები, სქემა და CasC ფრაგმენტები"
+
+#: lib/Settings.php
+msgid "YAML Fragment Sources (casc.d)"
+msgstr "YAML ფრაგმენტების წყაროები (casc.d)"
+
+#: lib/Settings.php
+msgid "Comma-separated list of YAML files or casc.d directories merged in deterministic lexical order."
+msgstr "მძიმით გამოყოფილი YAML ფაილების ან casc.d დირექტორიების სია, რომლებიც ერთიანდება დეტერმინისტული ლექსიკური თანმიმდევრობით."
+
+#: lib/Settings.php
+msgid "Fragment Merge Policy"
+msgstr "ფრაგმენტების გაერთიანების პოლიტიკა"
+
+#: lib/Settings.php
+msgid "Strict rejects conflicting scalar keys across fragments; overlay lets later fragments override earlier values."
+msgstr "მკაცრი რეჟიმი უარყოფს ფრაგმენტებს შორის კონფლიქტურ სკალარულ გასაღებებს; გადაფარვა საშუალებას აძლევს შემდგომ ფრაგმენტებს გადაფარონ წინა მნიშვნელობები."
+
+#: lib/Settings.php
+msgid "Strict (fail on scalar conflicts)"
+msgstr "მკაცრი (შეცდომა სკალარულ კონფლიქტებზე)"
+
+#: lib/Settings.php
+msgid "Overlay (later fragments override)"
+msgstr "გადაფარვა (შემდგომი ფრაგმენტები ფარავს წინას)"
+
+#: lib/Settings.php
+msgid "Monitoring Packs Directory"
+msgstr "მონიტორინგის პაკეტების დირექტორია"
+
+#: lib/Settings.php
+msgid "Base directory containing versioned YAML Monitoring Packs and lockfiles."
+msgstr "საბაზისო დირექტორია, რომელიც შეიცავს ვერსიირებულ YAML მონიტორინგის პაკეტებსა და ბლოკირების ფაილებს."
+
+#: lib/Settings.php
+msgid "Keep Plugin Tables on Uninstall"
+msgstr "მოდულის ცხრილების შენარჩუნება დეინსტალაციისას"
+
+#: lib/Settings.php
+msgid "Preserve plugin_yaml_packs, plugin_yaml_queries, and plugin_yaml_audit tables when uninstalling the plugin."
+msgstr "შეინარჩუნეთ plugin_yaml_packs, plugin_yaml_queries და plugin_yaml_audit ცხრილები მოდულის წაშლისას."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later. This server runs PHP %s, so the plugin was not installed or enabled."
+msgstr "YAML მოდულს სჭირდება PHP %s ან უფრო ახალი. ამ სერვერზე გაშვებულია PHP %s, ამიტომ მოდული არ დაინსტალირდა და არ გააქტიურდა."
+
+#: setup.php
+msgid "Import/Export"
+msgstr "იმპორტი/ექსპორტი"
+
+#: setup.php
+msgid "YAML"
+msgstr "YAML"
+
+#: setup.php
+msgid "The YAML plugin is not enabled."
+msgstr "YAML მოდული გააქტიურებული არ არის."
+
+#: setup.php
+#, php-format
+msgid "The YAML plugin requires PHP %s or later."
+msgstr "YAML მოდულს სჭირდება PHP %s ან უფრო ახალი."
+
+#: yaml_admin.php yaml_operator.php
+msgid "CSRF token validation failed. Reload the page and retry."
+msgstr "CSRF ტოკენის ვალიდაცია ვერ მოხერხდა. განაახლეთ გვერდი და სცადეთ ხელახლა."
+
+#: yaml_admin.php
+msgid "Configure yaml_source_paths in Cacti Settings before running reload."
+msgstr "გადატვირთვის გაშვებამდე დააკონფიგურირეთ yaml_source_paths Cacti-ის პარამეტრებში."
+
+#: yaml_admin.php
+msgid "No matching pending reload plan was found in your session. Compute a fresh plan first."
+msgstr "თქვენს სესიაში შესაბამისი მომლოდინე გადატვირთვის გეგმა ვერ მოიძებნა. ჯერ გამოთვალეთ ახალი გეგმა."
+
+#: yaml_admin.php
+msgid "YAML Reload & Monitoring Packs (Administrator)"
+msgstr "YAML გადატვირთვა და მონიტორინგის პაკეტები (ადმინისტრატორი)"
+
+#: yaml_admin.php
+msgid "Compute Reload Plan from Configured Sources"
+msgstr "გადატვირთვის გეგმის გამოთვლა კონფიგურირებული წყაროებიდან"
+
+#: yaml_operator.php
+msgid "Provide a YAML document to validate or compile."
+msgstr "მიუთითეთ YAML დოკუმენტი ვალიდაციისთვის ან კომპილაციისთვის."
+
+#: yaml_operator.php
+#, php-format
+msgid "Compiled %s successfully."
+msgstr "%s წარმატებით დაკომპილირდა."
+
+#: yaml_operator.php
+msgid "YAML syntax, placeholders, and cross-parameter invariants passed."
+msgstr "YAML სინტაქსმა, ჩანაცვლების ველებმა და პარამეტრთაშორისმა ინვარიანტებმა შემოწმება გაიარა."
+
+#: yaml_operator.php
+msgid "YAML Validate, Compile & Dry-Run Preview (Operator)"
+msgstr "YAML ვალიდაცია, კომპილაცია და საცდელი წინასწარი ნახვა (ოპერატორი)"
+
+#: yaml_operator.php
+msgid "YAML Template, Data Query, or CasC Fragment:"
+msgstr "YAML შაბლონი, მონაცემთა მოთხოვნა ან CasC ფრაგმენტი:"
+
+#: yaml_operator.php
+msgid "Validate & Redact"
+msgstr "ვალიდაცია და დაფარვა"
+
+#: yaml_operator.php
+msgid "Compile to Cacti XML"
+msgstr "კომპილაცია Cacti XML-ში"
+
+#: yaml_view.php
+msgid "YAML Schema, Reference & Redacted State"
+msgstr "YAML სქემა, ცნობარი და დაფარული მდგომარეობა"
